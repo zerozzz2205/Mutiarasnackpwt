@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "UMKM product item",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Product identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product name"
+        },
+        "price": {
+          "type": "integer",
+          "description": "Product price in Rupiah"
+        },
+        "category": {
+          "type": "string",
+          "description": "Product category (e.g. Keripik, Peyek)"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Product cover image URL"
+        }
+      },
+      "required": ["id", "name", "price", "category", "imageUrl"]
+    },
+    "Portfolio": {
+      "title": "Portfolio",
+      "description": "Past order documentation and client testimonial",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Portfolio identifier"
+        },
+        "title": {
+          "type": "string",
+          "description": "Order title or event name"
+        },
+        "details": {
+          "type": "string",
+          "description": "Order package description details"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Documentation image URL"
+        },
+        "clientName": {
+          "type": "string",
+          "description": "Client representative name"
+        },
+        "testimonial": {
+          "type": "string",
+          "description": "Client review testimonial quote"
+        }
+      },
+      "required": ["id", "title", "details", "imageUrl", "clientName", "testimonial"]
+    },
+    "MediaItem": {
+      "title": "MediaItem",
+      "description": "Gallery image item in media picker",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Media item identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Media asset name"
+        },
+        "url": {
+          "type": "string",
+          "description": "Media asset cloud URL"
+        }
+      },
+      "required": ["id", "name", "url"]
+    },
+    "LocationSettings": {
+      "title": "LocationSettings",
+      "description": "Outlet locator leaf map coordinates and details",
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "Sidoarjo outlet street address description"
+        },
+        "lat": {
+          "type": "number",
+          "description": "Leaflet map latitude coordinate"
+        },
+        "lng": {
+          "type": "number",
+          "description": "Leaflet map longitude coordinate"
+        },
+        "gmapsUrl": {
+          "type": "string",
+          "description": "Direct Google Maps navigate directions link"
+        }
+      },
+      "required": ["address", "lat", "lng", "gmapsUrl"]
+    }
+  },
+  "firestore": {
+    "products": {
+      "schema": "Product",
+      "description": "Active product catalog collection"
+    },
+    "portfolios": {
+      "schema": "Portfolio",
+      "description": "Catering order documentation showcase"
+    },
+    "media_gallery": {
+      "schema": "MediaItem",
+      "description": "Media library assets for selection and reuse"
+    },
+    "location": {
+      "schema": "LocationSettings",
+      "description": "Geographical outlet marker info settings"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Safety Net: Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 2. Collection Rules for Product catalog
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidId(productId);
+    }
+
+    // 3. Collection Rules for Portfolios (Past Event Documentations)
+    match /portfolios/{portfolioId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidId(portfolioId);
+    }
+
+    // 4. Collection Rules for Media Gallery
+    match /media_gallery/{mediaId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidId(mediaId);
+    }
+
+    // 5. Collection Rules for Location Settings
+    match /location/{locationId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidId(locationId);
+    }
+  }
+}

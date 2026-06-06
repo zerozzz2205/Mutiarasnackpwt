@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kontrol Admin | Mutiara Snack</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#c2410c', // orange-700
+                        secondary: '#ea580c', // orange-600
+                        accent: '#9a3412', // orange-800
+                        dark: '#1e293b', // slate-800
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Style overrides -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        
+        .tab-btn.active-tab {
+            background-color: white;
+            color: #c2410c;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); /* shadow-sm */
+            font-weight: 700;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #leaflet-preview-map {
+            height: 320px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-850 font-sans flex flex-col">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
+
+    <!-- Screen Login Gate -->
+    <div id="login-panel" class="hidden min-h-screen bg-slate-900 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-8 sm:p-10 border border-slate-100 flex flex-col">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-orange-100 text-primary rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h1 class="font-display font-bold text-3xl text-slate-900 tracking-tight leading-tight">Akses Admin</h1>
+                <p class="text-slate-500 font-medium text-sm mt-2">Mutiara Snack Gateway • Ibu Triyanti</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-5" onsubmit="handleAdminAuthLogin(event)">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">E-mail Admin</label>
+                    <div class="relative">
+                        <input required type="email" id="login-email" placeholder="contoh: mutiarasnack@gmail.com" class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium text-slate-800">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">Password</label>
+                    <div class="relative">
+                        <input required type="password" id="login-password" placeholder="Password PIN" class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium text-slate-800 tracking-wide">
+                        <i data-lucide="key" class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 mt-2 bg-primary hover:bg-secondary text-white font-bold rounded-2xl shadow-xl shadow-orange-100 hover:shadow-orange-200 transition-all flex items-center justify-center gap-3 text-base">
+                    Masuk Dashboard <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-400 leading-relaxed font-medium">
+                Peringatan: Pastikan login email telah diaktifkan di Firebase Authentication panel. Gunakan sandi tepercaya Anda.
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Admin Dashboard View -->
+    <div id="admin-dashboard" class="hidden flex-1 flex flex-col h-full bg-slate-50">
+        
+        <!-- Navigation Top Bar Header -->
+        <header id="header-bar" class="bg-gradient-to-r from-orange-800 to-orange-950 text-white px-5 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-orange-200">
+                    <i data-lucide="settings" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h2 class="font-display font-extrabold text-2xl italic tracking-tight flex items-center gap-2">Mutiara Snack</h2>
+                    <p class="text-orange-200/80 text-xs font-bold uppercase tracking-[0.15em]">Control Panel Ibu Triyanti</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="bg-white/10 px-4 py-2.5 rounded-xl flex items-center gap-2 border border-white/5">
+                    <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+                    <span id="admin-email-display" class="font-mono text-xs font-bold text-orange-100 truncate max-w-[200px]">admin@gmail.com</span>
+                </div>
+                <button onclick="handleAdminAuthLogout()" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all shadow-md">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                </button>
+            </div>
+        </header>
+
+        <!-- Horizontal Tab Menu -->
+        <nav id="horizontal-tabs" class="bg-white border-b border-slate-200 p-2 overflow-x-auto scrollbar-hide flex gap-1.5 shrink-0">
+            <button onclick="switchAdminTab('products')" id="tab-products" class="tab-btn active-tab flex items-center gap-2 px-5 py-3 text-xs font-black rounded-xl transition-all text-slate-500 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+                <i data-lucide="package" class="w-4 h-4"></i> Katalog Produk
+            </button>
+            <button onclick="switchAdminTab('portfolios')" id="tab-portfolios" class="tab-btn flex items-center gap-2 px-5 py-3 text-xs font-black rounded-xl transition-all text-slate-500 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+                <i data-lucide="award" class="w-4 h-4"></i> Dokumentasi & Testimoni
+            </button>
+            <button onclick="switchAdminTab('media')" id="tab-media" class="tab-btn flex items-center gap-2 px-5 py-3 text-xs font-black rounded-xl transition-all text-slate-500 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+                <i data-lucide="images" class="w-4 h-4"></i> Pustaka Media
+            </button>
+            <button onclick="switchAdminTab('location')" id="tab-location" class="tab-btn flex items-center gap-2 px-5 py-3 text-xs font-black rounded-xl transition-all text-slate-500 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> Lokasi & Peta
+            </button>
+            <button onclick="switchAdminTab('backup')" id="tab-backup" class="tab-btn flex items-center gap-2 px-5 py-3 text-xs font-black rounded-xl transition-all text-slate-500 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+                <i data-lucide="database" class="w-4 h-4"></i> Data & Backup
+            </button>
+        </nav>
+
+        <!-- Tab Views Frame Panel Container -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-5 sm:p-8">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- 1. PRODUCT CATALOG VIEW -->
+                <div id="view-products" class="tab-view space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
+                        <!-- Left Form Form -->
+                        <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                                        <i data-lucide="plus" class="w-5 h-5"></i>
+                                    </div>
+                                    Tambah Produk Baru
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Sediakan data kuliner terlengkap untuk pelanggan Anda.</p>
+                            </div>
+
+                            <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-4">
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Produk</label>
+                                    <input required type="text" id="prod-name" placeholder="misal: Tumpeng Nasi Kuning Premium" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga Jual (Rupiah)</label>
+                                    <input required type="number" id="prod-price" placeholder="misal: 15500" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kategori Jajanan</label>
+                                    <input required type="text" id="prod-category" placeholder="misal: Snack Box atau Kue Basah" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tautan Gambar / Foto Produk</label>
+                                        <button type="button" onclick="openGlobalMediaPicker('prod-imageUrl')" class="text-[11px] text-primary font-bold hover:underline flex items-center gap-1">
+                                            <i data-lucide="images" class="w-3 h-3"></i> Pilih Pustaka
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <input required type="text" id="prod-imageUrl" placeholder="Masukkan link foto (https://...) atau upload" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                        <button type="button" onclick="openGlobalMediaPicker('prod-imageUrl')" class="p-3 bg-orange-100 hover:bg-orange-200 text-primary rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0" title="Pilih dari Pustaka">
+                                            <i data-lucide="images" class="w-4 h-4"></i>
+                                        </button>
+                                        <label class="p-3 bg-orange-850 hover:bg-orange-950 text-white rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-sm relative shrink-0" title="Upload Langsung">
+                                            <i data-lucide="upload" class="w-4 h-4"></i>
+                                            <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleDirectUploadToInput(event, 'prod-imageUrl')">
+                                        </label>
+                                    </div>
+                                    <div id="prod-imageUrl-preview" class="hidden relative w-20 h-20 rounded-2xl overflow-hidden border border-orange-200 mt-2">
+                                        <img src="" class="w-full h-full object-cover">
+                                        <button type="button" onclick="resetFormPreview('prod-imageUrl')" class="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full"><i data-lucide="x" class="w-3 h-3"></i></button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full py-4 mt-2 bg-primary hover:bg-secondary text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-colors font-display">
+                                    <i data-lucide="check" class="w-4 h-4"></i> Daftarkan Produk Baru
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right list catalog Products active -->
+                        <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                        <div class="w-8 h-8 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center">
+                                            <i data-lucide="grid" class="w-5 h-5"></i>
+                                        </div>
+                                        Katalog Aktif (<span id="total-product-badge">0</span>)
+                                    </h3>
+                                    <p class="text-xs text-slate-400 mt-1">Semua jenis penganan kue basah dan kering milik Ibu Triyanti.</p>
+                                </div>
+                            </div>
+
+                            <!-- List products dynamic content area -->
+                            <div id="products-list-panel" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                                <!-- Dynamically loaded product list items row -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 2. PORTFOLIOS & CUSTOMER TESTIMONIALS VIEW -->
+                <div id="view-portfolios" class="tab-view hidden space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
+                        <!-- Form documentation portfolio -->
+                        <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                                        <i data-lucide="award" class="w-5 h-5"></i>
+                                    </div>
+                                    Tambah Portofolio Pesanan
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Dokumentasikan cerita penjualan atau pesanan tumpeng dan kotak bento corporate Anda.</p>
+                            </div>
+
+                            <form id="portfolio-form" onsubmit="handlePortfolioSubmit(event)" class="space-y-4">
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Judul Dokumentasi</label>
+                                    <input required type="text" id="port-title-in" placeholder="misal: 100 Tumpeng Mini Syukuran Bank Mandiri" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Detail Menu Acara</label>
+                                    <input required type="text" id="port-details-in" placeholder="misal: Ayam Bakar, Sup Telur Puyuh, Perkedel, Sambal Bajak" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Pelanggan / Lembaga</label>
+                                    <input required type="text" id="port-client-in" placeholder="misal: Ibu Diana (Surabaya)" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Link atau Unggah Dokumentasi Foto</label>
+                                        <button type="button" onclick="openGlobalMediaPicker('port-imageUrl-in')" class="text-[11px] text-primary font-bold hover:underline flex items-center gap-1">
+                                            <i data-lucide="images" class="w-3 h-3"></i> Pilih Pustaka
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <input required type="text" id="port-imageUrl-in" placeholder="Masukkan link foto (https://...) atau upload" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                        <button type="button" onclick="openGlobalMediaPicker('port-imageUrl-in')" class="p-3 bg-orange-100 hover:bg-orange-200 text-primary rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0" title="Pilih dari Pustaka">
+                                            <i data-lucide="images" class="w-4 h-4"></i>
+                                        </button>
+                                        <label class="p-3 bg-orange-850 hover:bg-orange-950 text-white rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-sm relative shrink-0" title="Upload Langsung">
+                                            <i data-lucide="upload" class="w-4 h-4"></i>
+                                            <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleDirectUploadToInput(event, 'port-imageUrl-in')">
+                                        </label>
+                                    </div>
+                                    <div id="port-imageUrl-in-preview" class="hidden relative w-20 h-20 rounded-2xl overflow-hidden border border-orange-200 mt-2">
+                                        <img src="" class="w-full h-full object-cover">
+                                        <button type="button" onclick="resetFormPreview('port-imageUrl-in')" class="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full"><i data-lucide="x" class="w-3 h-3"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Isi Testimoni Klien</label>
+                                    <textarea required id="port-testimonial-in" rows="2" placeholder="Tuliskan kata ulasan puas pelanggan mengenai hidangan..." class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800 resize-none"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-4 mt-2 bg-primary hover:bg-secondary text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-colors font-display">
+                                    <i data-lucide="check" class="w-4 h-4"></i> Simpan Portofolio
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right active portfolio items -->
+                        <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="award" class="w-5 h-5"></i>
+                                    </div>
+                                    Dokumentasi & Testimoni Kuat (<span id="total-portfolios-badge">0</span>)
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Ulasan pesanan terverifikasi yang didisplay pada halaman utama pembeli.</p>
+                            </div>
+
+                            <!-- Portfolio view list items content -->
+                            <div id="portfolios-list-panel" class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+                                <!-- Dynamically loaded feedback portfolios -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 3. MEDIA AND PHOTO GALLERY LIBRARY VIEW -->
+                <div id="view-media" class="tab-view hidden space-y-8">
+                    
+                    <!-- Auxiliary Section GDrive Helper Tools -->
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 p-6 sm:p-8 rounded-[2.5rem] border border-orange-100 shadow-sm space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center shrink-0">
+                                <i data-lucide="cloud" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-950">Asisten Foto Google Drive</h3>
+                                <p class="text-xs text-slate-500 mt-1">Konversi link sebaran file biasa Google Drive Anda menjadi link visual permanen untuk produk atau katalog.</p>
+                            </div>
+                        </div>
+
+                        <!-- Panel layout helper tester -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                            
+                            <!-- Guide instructions -->
+                            <div class="bg-white/60 p-5 rounded-2xl border border-orange-100/30 text-xs font-medium text-slate-600 space-y-2">
+                                <span class="font-extrabold text-orange-950 uppercase tracking-widest flex items-center gap-1.5">
+                                    <i data-lucide="help-circle" class="w-4 h-4 text-primary"></i> Langkah Ambil Foto Drive Anda:
+                                </span>
+                                <ol class="list-decimal pl-4 space-y-1">
+                                    <li>Upload foto tumpeng/kue ke folder Google Drive pribadi Anda.</li>
+                                    <li>Klik kanan -> pilih <b>Bagikan (Share)</b> -> ubah akses ke <b>"Siapa saja memiliki link" (Anyone with link)</b>.</li>
+                                    <li>Salin link bagikan, kemudian tempel di kolom konverter di sebelah kanan!</li>
+                                </ol>
+                            </div>
+
+                            <!-- Convert action input -->
+                            <div class="bg-white p-5 rounded-2xl border border-orange-100/50 flex flex-col gap-3 justify-center shadow-sm">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paste Link Bagikan Google Drive</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="converter-url-in" placeholder="https://drive.google.com/file/d/..." class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary outline-none text-xs font-bold text-slate-800">
+                                    <button type="button" onclick="handleConvertGDriveLink()" class="px-4 py-3 bg-primary hover:bg-secondary text-white font-bold rounded-xl text-xs shadow-md transition-colors shrink-0">
+                                        Proses Link
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Live outcome conversion sandbox -->
+                        <div id="converter-outcome-sandbox" class="hidden bg-white p-6 rounded-2xl border border-orange-100/60 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+                            <div class="w-32 aspect-square rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200">
+                                <img id="converter-preview-img" src="" class="w-full h-full object-cover" onerror="handleConverterPreviewError()">
+                            </div>
+                            <div class="flex-1 space-y-3 w-full">
+                                <div class="flex items-center gap-1.5 text-xs text-green-700 font-extrabold">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i> Link Tautan Gambar Siap Digunakan!
+                                </div>
+                                <input readonly type="text" id="converter-outcome-url" class="w-full p-3 bg-slate-50 text-slate-800 font-mono text-xs rounded-xl border border-slate-200 select-all cursor-pointer" onclick="this.select()">
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="applyConvertedValueToTarget('prod-imageUrl')" class="px-3.5 py-2 bg-orange-800 hover:bg-orange-950 text-white font-extrabold rounded-lg text-[10px] transition-all flex items-center gap-1">
+                                        <i data-lucide="package" class="w-3.5 h-3.5"></i> Tempel Pada Produk
+                                    </button>
+                                    <button onclick="applyConvertedValueToTarget('port-imageUrl-in')" class="px-3.5 py-2 bg-orange-850 hover:bg-orange-950 text-white font-extrabold rounded-lg text-[10px] transition-all flex items-center gap-1">
+                                        <i data-lucide="award" class="w-3.5 h-3.5"></i> Tempel Pada Portofolio
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Store Library Panel -->
+                    <div class="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                        
+                        <!-- Header with direct quick action uploaders -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="images" class="w-5 h-5"></i>
+                                    </div>
+                                    Pustaka Foto Tersimpan (<span id="total-gallery-items">0</span>)
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Simpan dan gunakan berkas visual foto tumpeng atau kue di server.</p>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                                <label class="flex-1 sm:flex-initial px-4 py-3 bg-primary hover:bg-secondary text-white rounded-xl text-xs font-black flex items-center justify-center gap-2 cursor-pointer shadow-md transition-colors">
+                                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Berkas Baru
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleGalleryImmediateFileUpload(event)">
+                                </label>
+                                <button onclick="openLinkRegistrationPopup()" class="flex-1 sm:flex-initial px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-colors">
+                                    <i data-lucide="link" class="w-4 h-4"></i> Daftar Link Foto
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Registration form popover banner custom link -->
+                        <div id="link-registration-popup-box" class="hidden bg-slate-50 p-5 rounded-2xl border border-slate-200/60 shadow-inner flex flex-col md:flex-row items-end gap-4">
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Label Judul / Nama Makanan</label>
+                                    <input required type="text" id="reg-image-label" placeholder="misal: Pastel Telur Spesial" class="px-4 py-3 bg-white rounded-xl border border-slate-150 focus:border-primary outline-none text-xs font-bold text-slate-800">
+                                </div>
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Link Foto Gambar Bebas</label>
+                                    <input required type="url" id="reg-image-url" placeholder="https://..." class="px-4 py-3 bg-white rounded-xl border border-slate-150 focus:border-primary outline-none text-xs font-bold text-slate-800">
+                                </div>
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0 shrink-0">
+                                <button onclick="handleRegisterLinkToGallery()" class="flex-1 md:flex-initial px-4 py-3 bg-orange-850 hover:bg-orange-950 text-white font-bold text-xs rounded-xl">
+                                    Daftarkan Link
+                                </button>
+                                <button onclick="closeLinkRegistrationPopup()" class="px-3 py-3 bg-white text-slate-600 font-bold text-xs rounded-xl border border-slate-150">
+                                    Batal
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gallery list search block filter -->
+                        <div class="relative bg-slate-50 p-4 rounded-2xl max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-8 top-1/2 -translate-y-1/2"></i>
+                            <input oninput="handleSearchInGalleryAdmin(this.value)" type="text" placeholder="Ketik untuk mencari foto..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-150 focus:border-primary outline-none text-xs font-semibold text-slate-800">
+                        </div>
+
+                        <!-- Grid photo display box -->
+                        <div id="gallery-admin-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <!-- Dynamic items generated rows -->
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 4. LOCATION OUTLET SETUP AND GEOGRAPHIC COORDINATES -->
+                <div id="view-location" class="tab-view hidden space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
+                        <!-- Inputs layout forms -->
+                        <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                                        <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                    </div>
+                                    Konfigurasi Lokasi & Maps
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Ubah letak wilayah pengiriman dan coordinates fisik lapak Ibu Triyanti.</p>
+                            </div>
+
+                            <form id="location-setup-form" onsubmit="handleLocationConfigSubmit(event)" class="space-y-4">
+                                <div class="space-y-1.5 flex flex-col col-span-2">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Alamat Outlet Lengkap</label>
+                                    <textarea required id="loc-address-in" rows="2" placeholder="Jl. Raya Sidoarjo No. 129, Sidoarjo, Jawa Timur" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800 resize-none"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-1.5 flex flex-col">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lintang (Latitude)</label>
+                                        <input required type="number" step="any" id="loc-lat-in" placeholder="-7.3486" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                    </div>
+                                    <div class="space-y-1.5 flex flex-col">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bujur (Longitude)</label>
+                                        <input required type="number" step="any" id="loc-lng-in" placeholder="112.7231" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1.5 flex flex-col">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Google Maps Direct Link</label>
+                                    <input required type="url" id="loc-gmaps-in" placeholder="https://maps.google.com/..." class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-150 focus:border-primary focus:bg-white outline-none text-xs font-semibold text-slate-800">
+                                    <p class="text-[11px] text-orange-650/80 font-bold italic mt-1 flex items-center gap-1.5 leading-normal">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-primary shrink-0"></i>
+                                        Digunakan pelanggan pada tombol "Petunjuk Arah" menuju outlet Anda.
+                                    </p>
+                                </div>
+
+                                <button type="submit" class="w-full py-4 mt-2 bg-primary hover:bg-secondary text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-colors font-display">
+                                    <i data-lucide="save" class="w-4 h-4"></i> Simpan Peta & Lokasi
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Leaflet Map Preview visualization -->
+                        <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="map" class="w-5 h-5"></i>
+                                    </div>
+                                    Visualisasi Peta Lapak
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Pratinjau fisik koordinat yang tersimpan di sistem.</p>
+                            </div>
+
+                            <!-- Map box space -->
+                            <div class="relative rounded-[2rem] overflow-hidden border border-slate-200 bg-slate-50 shadow-inner">
+                                <div id="leaflet-preview-map" class="w-full"></div>
+                                <div class="absolute bottom-2 left-2 z-20 bg-white/95 px-3 py-1.5 rounded-lg shadow-md border border-slate-100 flex items-center gap-1.5 pointer-events-none">
+                                    <div class="w-2 h-2 bg-red-650 rounded-full animate-ping"></div>
+                                    <span class="text-[10px] font-extrabold text-slate-700 uppercase tracking-widest">Pin Posisi Terdaftar</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 5. BACKUP DATA & RECOVER JSON UTILITY SYSTEM -->
+                <div id="view-backup" class="tab-view hidden space-y-8">
+                    <div class="max-w-3xl mx-auto bg-white p-6 sm:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-orange-100 text-primary rounded-2xl flex items-center justify-center shrink-0">
+                                <i data-lucide="database" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-display font-bold text-2xl text-slate-900">Manajemen Pemulihan & Backup</h3>
+                                <p class="text-xs text-slate-400 mt-1">Unduh semua database internal Anda ke file backup lokal, atau unggah cadangan file Anda untuk dipulihkan kembali.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3.5">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-700 shrink-0 mt-0.5"></i>
+                            <div class="text-xs text-amber-900 leading-relaxed font-semibold">
+                                <p class="font-extrabold">Informasi Keamanan Penting:</p>
+                                <p class="mt-1">Melakukan pengunggahan "File Backup Kelola" akan memperbarui katalog produk, portofolio, dan media di Firestore database. Harap simpan backup lama Anda secara tertib!</p>
+                            </div>
+                        </div>
+
+                        <!-- Double columns back up operations -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Download Block -->
+                            <div class="border-2 border-slate-100 p-6 rounded-2xl flex flex-col justify-between items-center text-center gap-4 bg-slate-50/50">
+                                <div class="space-y-1">
+                                    <i data-lucide="download" class="w-8 h-8 text-primary mx-auto"></i>
+                                    <h4 class="font-bold text-slate-900 text-sm mt-3">Unduh Back-up (.json)</h4>
+                                    <p class="text-[11px] text-slate-400 leading-normal">Unduh seluruh berkas katalog dan data portofolio toko.</p>
+                                </div>
+                                <button onclick="handleDownloadLocalBackupJSON()" class="w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors">
+                                    <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> Unduh Berkas
+                                </button>
+                            </div>
+
+                            <!-- Upload Block -->
+                            <div class="border-2 border-dashed border-slate-200 p-6 rounded-2xl flex flex-col justify-between items-center text-center gap-4 bg-slate-50/20 hover:bg-slate-50/50 transition-all">
+                                <div class="space-y-1">
+                                    <i data-lucide="upload-cloud" class="w-8 h-8 text-primary mx-auto"></i>
+                                    <h4 class="font-bold text-slate-900 text-sm mt-3">Pulihkan Data (.json)</h4>
+                                    <p class="text-[11px] text-slate-400 leading-normal">Unggah berkas database (.json) lama Anda untuk sinkronisasi.</p>
+                                </div>
+                                <label class="w-full py-3 bg-slate-800 hover:bg-slate-950 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all text-center cursor-pointer shadow-sm">
+                                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih File Pulih
+                                    <input type="file" id="json-backup-uploader" accept=".json" class="hidden" onchange="handleRestoreLocalBackupJSON(event)">
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Media Gallery Selector Popup Picker Modal Overlay Overlay -->
+    <div id="picker-modal-overlay" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" onclick="closeGlobalMediaPicker()"></div>
+        <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden max-h-[85vh] flex flex-col border border-slate-100 animate-fade-in z-20">
+            
+            <div class="bg-primary p-6 text-white flex items-center justify-between shadow-md">
+                <div>
+                    <h4 class="text-xl font-bold font-display italic flex items-center gap-2">
+                        <i data-lucide="images" class="w-5 h-5 text-orange-200"></i> Pilih Dari Pustaka
+                    </h4>
+                    <p class="text-[8px] uppercase font-extrabold tracking-widest mt-0.5 text-orange-200">Mutiara Snack Gallery Picker</p>
+                </div>
+                <button onclick="closeGlobalMediaPicker()" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-xl transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Header Quick upload directly from inside selection -->
+            <div class="p-4 bg-orange-50/30 border-b border-orange-100/60 flex items-center gap-2.5">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input oninput="searchInPickerGallery(this.value)" type="text" placeholder="Cari foto di pustaka..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none text-xs font-semibold text-slate-800">
+                </div>
+                <label class="px-4 py-2.5 bg-primary hover:bg-secondary text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors shrink-0">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Baru
+                    <input type="file" accept="image/*" class="hidden" onchange="handlePickerDirectUpload(event)">
+                </label>
+            </div>
+
+            <!-- Content list files -->
+            <div class="p-6 overflow-y-auto scrollbar-hide flex-1 bg-slate-50/50">
+                <div id="picker-grid-block" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <!-- Picker items row loaded dynamically -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Leaflet JS Library -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Lucide Icon Loader -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase Compat SDK Loader Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // System variables
+        let appInstance, authInst, dbInst;
+        let activeTabName = 'products';
+        let currentTargetInputId = null;
+
+        // Reactive datasets synchronized in real-time with Firestore on snapshot
+        let products = [];
+        let portfolios = [];
+        let mediaGallery = [];
+        let locationSettings = {
+            address: 'Jl. Niaga Sidoarjo No.14, Sidoarjo, Jawa Timur',
+            lat: -7.3486,
+            lng: 112.7231,
+            gmapsUrl: 'https://maps.google.com/?q=-7.3486,112.7231'
+        };
+
+        // Snapshot listeners unsubscribers references
+        let prodUnsub = null;
+        let portUnsub = null;
+        let galUnsub = null;
+
+        // Leaflet references
+        let leafletMap = null;
+        let leafletMarker = null;
+
+        // Initialize Firebase on document load
+        window.onload = function() {
+            lucide.createIcons();
+            loadFirebaseEnvironment();
+        };
+
+        // Core system startup configuration loader
+        async function loadFirebaseEnvironment() {
+            try {
+                const response = await fetch('./firebase-applet-config.json');
+                if (!response.ok) {
+                    throw new Error("Gagal mengambil file kredensial.");
+                }
+                const credentials = await response.ok ? await response.json() : {};
+                
+                // Initialize Compat SDK
+                firebase.initializeApp(credentials);
+                authInst = firebase.auth();
+                dbInst = firebase.firestore();
+
+                // Authentication state changes listener hook
+                authInst.onAuthStateChanged((user) => {
+                    if (user) {
+                        displayDashboardScreen(user);
+                    } else {
+                        displayLoginScreen();
+                    }
+                });
+
+            } catch (err) {
+                console.error("Gagal startup Firebase System: ", err);
+                addToast("Error sistem: " + err.message, "error");
+            }
+        }
+
+        // Display login portal gating
+        function displayLoginScreen() {
+            document.getElementById('login-panel').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            stopRealTimeListeners();
+        }
+
+        // Display dashboard space once user is authenticated
+        function displayDashboardScreen(user) {
+            document.getElementById('login-panel').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            document.getElementById('admin-email-display').textContent = user.email || 'Admin';
+            
+            lucide.createIcons();
+            startRealTimeListeners();
+            
+            // Render Leaflet container sizing on tab load timer buffer
+            setTimeout(() => {
+                initPreviewMap();
+            }, 300);
+        }
+
+        // Handle form login
+        function handleAdminAuthLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+
+            if (!email || !pass) {
+                addToast("Email dan sandi harus terisi penuh", "error");
+                return;
+            }
+
+            authInst.signInWithEmailAndPassword(email, pass)
+                .then((creds) => {
+                    addToast("Selamat Datang, Admin Mutiara Snack!", "success");
+                })
+                .catch((error) => {
+                    console.error("Mati gagal login: ", error);
+                    addToast("PIN / Email Salah: " + error.message, "error");
+                });
+        }
+
+        // Log out admin
+        function handleAdminAuthLogout() {
+            if (confirm("Apakah Anda yakin ingin keluar dari panel admin?")) {
+                authInst.signOut()
+                    .then(() => {
+                        addToast("Berhasil keluar dari sesi.", "success");
+                    })
+                    .catch((err) => {
+                        addToast("Gagal keluar: " + err.message, "error");
+                    });
+            }
+        }
+
+        // Error report logs parser structurally complying with firebase validation rules JSON log schema
+        function logFirestoreRuleFailure(error, opType, pathStr) {
+            const user = authInst ? authInst.currentUser : null;
+            const logObj = {
+                error: error.message || error.toString(),
+                operationType: opType,
+                path: pathStr,
+                authInfo: {
+                    userId: user ? user.uid : null,
+                    email: user ? user.email : null,
+                    isAnonymous: user ? user.isAnonymous : false,
+                }
+            };
+            console.error("Firebase Error Log System: ", JSON.stringify(logObj, null, 2));
+        }
+
+        // Real-time synchronization listeners initializer
+        function startRealTimeListeners() {
+            // Unsubscribe existing logs beforehand to prevent memory cluttering
+            stopRealTimeListeners();
+
+            // 1. Sync Products katalog
+            prodUnsub = dbInst.collection('products')
+                .onSnapshot((snapshot) => {
+                    products = [];
+                    snapshot.forEach((doc) => {
+                        products.push(doc.data());
+                    });
+                    // Newest first
+                    products.sort((a, b) => b.id.localeCompare(a.id));
+                    document.getElementById('total-product-badge').textContent = products.length;
+                    renderProductsAdmin();
+                }, (error) => {
+                    logFirestoreRuleFailure(error, 'list', 'products');
+                    addToast("Gagal mematangkan data produk: " + error.message, "error");
+                });
+
+            // 2. Sync Portfolios testimoni
+            portUnsub = dbInst.collection('portfolios')
+                .onSnapshot((snapshot) => {
+                    portfolios = [];
+                    snapshot.forEach((doc) => {
+                        portfolios.push(doc.data());
+                    });
+                    portfolios.sort((a, b) => b.id.localeCompare(a.id));
+                    document.getElementById('total-portfolios-badge').textContent = portfolios.length;
+                    renderPortfoliosAdmin();
+                }, (error) => {
+                    logFirestoreRuleFailure(error, 'list', 'portfolios');
+                    addToast("Gagal mematangkan data portofolio: " + error.message, "error");
+                });
+
+            // 3. Sync Media Library gallery
+            galUnsub = dbInst.collection('media_gallery')
+                .onSnapshot((snapshot) => {
+                    mediaGallery = [];
+                    snapshot.forEach((doc) => {
+                        mediaGallery.push(doc.data());
+                    });
+                    mediaGallery.sort((a, b) => b.id.localeCompare(a.id));
+                    document.getElementById('total-gallery-items').textContent = mediaGallery.length;
+                    renderMediaGalleryAdmin();
+                }, (error) => {
+                    logFirestoreRuleFailure(error, 'list', 'media_gallery');
+                    addToast("Gagal mematangkan galeri media: " + error.message, "error");
+                });
+
+            // 4. One-time load Location Settings
+            dbInst.collection('location').doc('settings').get()
+                .then((docSnap) => {
+                    if (docSnap.exists) {
+                        locationSettings = docSnap.data();
+                    } else {
+                        console.warn("Location configuration document empty in Firestore, seeding defaults...");
+                        // Seed defaults silently
+                        dbInst.collection('location').doc('settings').set(locationSettings);
+                    }
+                    fillLocationInputsData();
+                    updateLeafletTargetPoint();
+                })
+                .catch((error) => {
+                    logFirestoreRuleFailure(error, 'get', 'location/settings');
+                });
+        }
+
+        // Close snapshot observers
+        function stopRealTimeListeners() {
+            if (prodUnsub) prodUnsub();
+            if (portUnsub) portUnsub();
+            if (galUnsub) galUnsub();
+            prodUnsub = null;
+            portUnsub = null;
+            galUnsub = null;
+        }
+
+        // Switch panel tabs view
+        function switchAdminTab(targetTab) {
+            activeTabName = targetTab;
+            
+            // Setup buttons styling
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+            });
+            const activeBtn = document.getElementById('tab-' + targetTab);
+            if (activeBtn) activeBtn.classList.add('active-tab');
+
+            // Setup containers visibility
+            document.querySelectorAll('.tab-view').forEach(view => {
+                view.classList.add('hidden');
+            });
+            const activeContainer = document.getElementById('view-' + targetTab);
+            if (activeContainer) activeContainer.classList.remove('hidden');
+
+            // Lazy resize map redraw if location loaded
+            if (targetTab === 'location') {
+                setTimeout(() => {
+                    if (leafletMap) {
+                        leafletMap.invalidateSize();
+                        updateLeafletTargetPoint();
+                    }
+                }, 300);
+            }
+        }
+
+        // --- products catalog CRUD ---
+        function renderProductsAdmin() {
+            const listContainer = document.getElementById('products-list-panel');
+            if (!listContainer) return;
+
+            listContainer.innerHTML = '';
+            if (products.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="py-12 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-100">
+                        <i data-lucide="package" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-xs text-slate-400 font-bold italic">Belum ada produk terdaftar.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            products.forEach(p => {
+                const imgPath = fixGDriveLink(p.imageUrl);
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100/60 rounded-2xl border border-slate-150 transition-colors gap-4";
+                row.innerHTML = `
+                    <div class="flex items-center gap-4 min-w-0 flex-1">
+                        <img src="${imgPath}" class="w-12 h-12 rounded-xl object-cover shadow-sm bg-white shrink-0 border border-slate-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm truncate">${p.name}</h4>
+                            <p class="text-xs text-primary font-black mt-0.5">${formatRupiah(p.price)} <span class="text-slate-400 font-medium font-sans"> • ${p.category}</span></p>
+                        </div>
+                    </div>
+                    <button onclick="handleDeleteProductByID('${p.id}')" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all shrink-0" title="Hapus Produk">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                `;
+                listContainer.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        // Product Form Submit Handler
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('prod-name').value.trim();
+            const price = Number(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value.trim();
+            const imageUrl = document.getElementById('prod-imageUrl').value.trim();
+
+            if (!name || isNaN(price) || !category || !imageUrl) {
+                addToast("Harap lengkapi semua input data terlebih dahulu", "error");
+                return;
+            }
+
+            const id = 'pr_' + Date.now().toString();
+            const newProd = { id, name, price, category, imageUrl };
+
+            dbInst.collection('products').doc(id).set(newProd)
+                .then(() => {
+                    addToast(`Produk "${name}" sukses ditambahkan!`, "success");
+                    e.target.reset();
+                    resetFormPreview('prod-imageUrl');
+                })
+                .catch((error) => {
+                    logFirestoreRuleFailure(error, 'write', 'products/' + id);
+                    addToast("Gagal menyimpan produk: " + error.message, "error");
+                });
+        }
+
+        // Delete Product
+        function handleDeleteProductByID(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus produk ini dari katalog utama?")) {
+                dbInst.collection('products').doc(id).delete()
+                    .then(() => {
+                        addToast("Produk terhapus.", "success");
+                    })
+                    .catch((error) => {
+                        logFirestoreRuleFailure(error, 'delete', 'products/' + id);
+                        addToast("Gagal menghapus produk: " + error.message, "error");
+                    });
+            }
+        }
+
+
+        // --- portfolios ACARA & TESTIMONI CRUD ---
+        function renderPortfoliosAdmin() {
+            const listContainer = document.getElementById('portfolios-list-panel');
+            if (!listContainer) return;
+
+            listContainer.innerHTML = '';
+            if (portfolios.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="py-12 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-100">
+                        <i data-lucide="award" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-xs text-slate-400 font-bold italic">Belum ada dokumentasi ditambahkan.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            portfolios.forEach(p => {
+                const imgPath = fixGDriveLink(p.imageUrl);
+                const row = document.createElement('div');
+                row.className = "flex flex-col p-5 bg-slate-50 hover:bg-slate-100/60 rounded-2xl border border-slate-150 transition-colors gap-3 relative group";
+                row.innerHTML = `
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
+                            <img src="${imgPath}" class="w-12 h-12 rounded-xl object-cover shadow-sm bg-white shrink-0 border border-slate-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-slate-900 text-sm truncate">${p.title}</h4>
+                                <p class="text-xs text-slate-500 font-medium">Klien: <b class="text-slate-800">${p.clientName}</b></p>
+                            </div>
+                        </div>
+                        <button onclick="handleDeletePortfolioByID('${p.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0" title="Hapus Portofolio">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl border border-slate-200/50 text-xs text-slate-650 leading-relaxed italic select-all">
+                        "${p.testimonial}"
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono flex justify-between">
+                        <span>Menu: ${p.details}</span>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        // Portfolio Submit Handler
+        function handlePortfolioSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('port-title-in').value.trim();
+            const details = document.getElementById('port-details-in').value.trim();
+            const clientName = document.getElementById('port-client-in').value.trim();
+            const imageUrl = document.getElementById('port-imageUrl-in').value.trim();
+            const testimonial = document.getElementById('port-testimonial-in').value.trim();
+
+            if (!title || !details || !clientName || !imageUrl || !testimonial) {
+                addToast("Harap lengkapi seluruh formulir portofolio", "error");
+                return;
+            }
+
+            const id = 'pf_' + Date.now().toString();
+            const newPort = { id, title, details, clientName, imageUrl, testimonial, clientName }; // keep aligned with old props map
+
+            dbInst.collection('portfolios').doc(id).set(newPort)
+                .then(() => {
+                    addToast(`Portofolio "${title}" sukses disimpan!`, "success");
+                    e.target.reset();
+                    resetFormPreview('port-imageUrl-in');
+                })
+                .catch((error) => {
+                    logFirestoreRuleFailure(error, 'write', 'portfolios/' + id);
+                    addToast("Gagal menyimpan portofolio: " + error.message, "error");
+                });
+        }
+
+        // Delete Portfolio
+        function handleDeletePortfolioByID(id) {
+            if (confirm("Hapus ulasan dokumentasi ini dari list aktif?")) {
+                dbInst.collection('portfolios').doc(id).delete()
+                    .then(() => {
+                        addToast("Portofolio terhapus.", "success");
+                    })
+                    .catch((error) => {
+                        logFirestoreRuleFailure(error, 'delete', 'portfolios/' + id);
+                        addToast("Gagal menghapus portofolio: " + error.message, "error");
+                    });
+            }
+        }
+
+
+        // --- PUSTAKA MEDIA PHOTO LIST & CONVERSION ---
+        function renderMediaGalleryAdmin() {
+            const grid = document.getElementById('gallery-admin-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            if (mediaGallery.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-16 text-center bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-100">
+                        <i data-lucide="images" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-xs text-slate-400 font-bold italic">Pustaka foto kosong.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            mediaGallery.forEach(item => {
+                const imgPath = fixGDriveLink(item.url);
+                const col = document.createElement('div');
+                col.className = 'group relative aspect-square rounded-[1.5rem] overflow-hidden border border-slate-150 bg-white hover:border-primary transition-all shadow-sm flex flex-col justify-between';
+                col.innerHTML = `
+                    <div class="relative w-full aspect-square overflow-hidden bg-slate-10s flex-1 cursor-pointer" onclick="copyValueToClipboard('${imgPath}', '${item.name}')">
+                        <img src="${imgPath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                        <div class="absolute bottom-0 inset-x-0 bg-black/60 p-2 text-white text-center">
+                            <p class="text-[9px] font-black truncate uppercase tracking-wider leading-none">${item.name}</p>
+                        </div>
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <span class="p-1 px-2.5 bg-white/95 text-primary text-[8px] font-black rounded-lg uppercase tracking-wider flex items-center gap-1">
+                                <i data-lucide="copy" class="w-2.5 h-2.5"></i> Salin Link
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-1 px-2.5 bg-slate-50 border-t border-slate-150 flex justify-between items-center text-[9px] text-slate-400 shrink-0">
+                        <span class="font-mono text-[8px]">${item.id.startsWith('g_') ? 'HP' : 'Drive'}</span>
+                        <button type="button" onclick="handleDeleteGalleryItem('${item.id}', event)" class="p-1 text-slate-400 hover:text-red-500 rounded" title="Hapus Foto">
+                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+            lucide.createIcons();
+        }
+
+        // Search inside gallery
+        function handleSearchInGalleryAdmin(queryTxt) {
+            const list = mediaGallery.filter(item => item.name.toLowerCase().includes(queryTxt.toLowerCase()));
+            const grid = document.getElementById('gallery-admin-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            if (list.length === 0) {
+                grid.innerHTML = `<p class="col-span-full py-8 text-center text-xs text-slate-400 font-medium italic">Pencarian untuk "${queryTxt}" tidak ditemukan.</p>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const imgPath = fixGDriveLink(item.url);
+                const col = document.createElement('div');
+                col.className = 'group relative aspect-square rounded-[1.5rem] overflow-hidden border border-slate-150 bg-white hover:border-primary transition-all shadow-sm flex flex-col justify-between';
+                col.innerHTML = `
+                    <div class="relative w-full aspect-square overflow-hidden bg-slate-10s flex-1 cursor-pointer" onclick="copyValueToClipboard('${imgPath}', '${item.name}')">
+                        <img src="${imgPath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                        <div class="absolute bottom-0 inset-x-0 bg-black/60 p-2 text-white text-center">
+                            <p class="text-[9px] font-black truncate uppercase tracking-wider leading-none">${item.name}</p>
+                        </div>
+                    </div>
+                    <div class="p-1 px-2.5 bg-slate-50 border-t border-slate-150 flex justify-between items-center text-[9px] text-slate-400 shrink-0">
+                        <span class="font-mono text-[8px]">${item.id.starts_with ? 'HP' : 'Drive'}</span>
+                        <button type="button" onclick="handleDeleteGalleryItem('${item.id}', event)" class="p-1 text-slate-400 hover:text-red-500 rounded">
+                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+            lucide.createIcons();
+        }
+
+        // Direct rapid upload Base64 for mobile HP
+        function handleGalleryImmediateFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const label = (file.name.split('.')[0] || 'HP Upload').substring(0, 16);
+                const id = 'g_' + Date.now().toString();
+
+                const newItem = { id, name: label, url: base64Url };
+
+                dbInst.collection('media_gallery').doc(id).set(newItem)
+                    .then(() => {
+                        addToast(`Foto "${label}" sukses diunggah ke pustaka!`, "success");
+                        e.target.value = '';
+                    })
+                    .catch((err) => {
+                        logFirestoreRuleFailure(err, 'write', 'media_gallery/' + id);
+                        addToast("Gagal upload foto: " + err.message, "error");
+                    });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Register link manually
+        function openLinkRegistrationPopup() {
+            document.getElementById('link-registration-popup-box').classList.remove('hidden');
+        }
+        function closeLinkRegistrationPopup() {
+            document.getElementById('link-registration-popup-box').classList.add('hidden');
+            document.getElementById('reg-image-label').value = '';
+            document.getElementById('reg-image-url').value = '';
+        }
+        function handleRegisterLinkToGallery() {
+            const label = document.getElementById('reg-image-label').value.trim();
+            const rawUrl = document.getElementById('reg-image-url').value.trim();
+
+            if (!label || !rawUrl) {
+                addToast("Isi label nama dan link tautan foto", "error");
+                return;
+            }
+
+            const finalUrl = fixGDriveLink(rawUrl);
+            const id = 'l_' + Date.now().toString();
+            const newItem = { id, name: label, url: finalUrl };
+
+            dbInst.collection('media_gallery').doc(id).set(newItem)
+                .then(() => {
+                    addToast(`Tautan "${label}" berhasil didaftarkan`, "success");
+                    closeLinkRegistrationPopup();
+                })
+                .catch((err) => {
+                    logFirestoreRuleFailure(err, 'write', 'media_gallery/' + id);
+                    addToast("Penyimpanan gagal: " + err.message, "error");
+                });
+        }
+
+        // GDrive Link Converter Processing Engine
+        function handleConvertGDriveLink() {
+            const urlInput = document.getElementById('converter-url-in').value.trim();
+            if (!urlInput) {
+                addToast("Tempel link foto Google Drive Anda terlebih dahulu!", "error");
+                return;
+            }
+
+            const finalLink = fixGDriveLink(urlInput);
+            
+            document.getElementById('converter-outcome-sandbox').classList.remove('hidden');
+            document.getElementById('converter-preview-img').src = finalLink;
+            document.getElementById('converter-outcome-url').value = finalLink;
+            addToast("Proses konversi tautan rampung!", "success");
+        }
+
+        function handleConverterPreviewError() {
+            addToast("Gambar gagal termuat. Atur foto Google Drive Anda ke akses Publik (Anyone with link)!", "error");
+        }
+
+        // Apply converted value to forms field inputs
+        function applyConvertedValueToTarget(inputId) {
+            const val = document.getElementById('converter-outcome-url').value;
+            if (!val) return;
+
+            const target = document.getElementById(inputId);
+            if (target) {
+                target.value = val;
+                updateVisualPreviewBox(inputId, val);
+                
+                // Highlight selector target
+                target.classList.add('ring-4', 'ring-primary/20');
+                setTimeout(() => target.classList.remove('ring-4', 'ring-primary/20'), 1500);
+
+                // Switch tabs back neatly
+                if (inputId.startsWith('prod-')) {
+                    switchAdminTab('products');
+                } else if (inputId.startsWith('port-')) {
+                    switchAdminTab('portfolios');
+                }
+                addToast("Tautan terpasang di formulir!", "success");
+            }
+        }
+
+        // Delete Gallery Item from system
+        function handleDeleteGalleryItem(id, e) {
+            if (e) e.stopPropagation();
+            if (confirm("Apakah Anda ingin menghapus foto ini dari pustaka tetap?")) {
+                dbInst.collection('media_gallery').doc(id).delete()
+                    .then(() => {
+                        addToast("Foto terhapus dari pustaka.", "success");
+                    })
+                    .catch((err) => {
+                        logFirestoreRuleFailure(err, 'delete', 'media_gallery/' + id);
+                        addToast("Gagal menghapus: " + err.message, "error");
+                    });
+            }
+        }
+
+
+        // --- LOCATION SETTINGS & GOOGLE MAPS COORDS ---
+        function fillLocationInputsData() {
+            document.getElementById('loc-address-in').value = locationSettings.address || '';
+            document.getElementById('loc-lat-in').value = locationSettings.lat || -7.3486;
+            document.getElementById('loc-lng-in').value = locationSettings.lng || 112.7231;
+            document.getElementById('loc-gmaps-in').value = locationSettings.gmapsUrl || '';
+        }
+
+        // Leaflet Preview Map Renderer Engine
+        function initPreviewMap() {
+            const centerLat = parseFloat(locationSettings.lat) || -7.3486;
+            const centerLng = parseFloat(locationSettings.lng) || 112.7231;
+
+            if (leafletMap) return; // Prevent double creation initialization
+
+            try {
+                leafletMap = L.map('leaflet-preview-map').setView([centerLat, centerLng], 14);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(leafletMap);
+
+                leafletMarker = L.marker([centerLat, centerLng]).addTo(leafletMap);
+            } catch (err) {
+                console.error("Gagal mendirikan Leaflet Map: ", err);
+            }
+        }
+
+        // Redraw marker pins
+        function updateLeafletTargetPoint() {
+            const lat = parseFloat(document.getElementById('loc-lat-in').value) || -7.3486;
+            const lng = parseFloat(document.getElementById('loc-lng-in').value) || 112.7231;
+
+            if (leafletMap && leafletMarker) {
+                const targetLatLng = new L.LatLng(lat, lng);
+                leafletMarker.setLatLng(targetLatLng);
+                leafletMap.setView(targetLatLng, 15);
+            }
+        }
+
+        // Handle physical location configuration submit
+        function handleLocationConfigSubmit(e) {
+            e.preventDefault();
+            const address = document.getElementById('loc-address-in').value.trim();
+            const lat = Number(document.getElementById('loc-lat-in').value);
+            const lng = Number(document.getElementById('loc-lng-in').value);
+            const gmapsUrl = document.getElementById('loc-gmaps-in').value.trim();
+
+            if (!address || isNaN(lat) || isNaN(lng) || !gmapsUrl) {
+                addToast("Harap isi semua kolom koordinat dan tautan Maps", "error");
+                return;
+            }
+
+            const updatedLoc = { address, lat, lng, gmapsUrl };
+
+            dbInst.collection('location').doc('settings').set(updatedLoc)
+                .then(() => {
+                    locationSettings = updatedLoc;
+                    updateLeafletTargetPoint();
+                    addToast("Pengaturan alamat & koordinat berhasil disimpan!", "success");
+                })
+                .catch((error) => {
+                    logFirestoreRuleFailure(error, 'write', 'location/settings');
+                    addToast("Gagal menyimpan koordinat: " + error.message, "error");
+                });
+        }
+
+
+        // --- BACKUP & RESTORE JSON ENGINE IMPLEMENTATION ---
+        function handleDownloadLocalBackupJSON() {
+            const dtObj = {
+                exportedAt: new Date().toISOString(),
+                appName: "Mutiara Snack Admin Suite Backup",
+                products: products,
+                portfolios: portfolios,
+                mediaGallery: mediaGallery,
+                locationSettings: locationSettings
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dtObj, null, 4));
+            const dlNode = document.createElement('a');
+            dlNode.setAttribute("href", dataStr);
+            dlNode.setAttribute("download", `mutiara_snack_full_backup_${Date.now()}.json`);
+            document.body.appendChild(dlNode);
+            dlNode.click();
+            dlNode.remove();
+            
+            addToast("File database cadangan sukses diunduh!", "success");
+        }
+
+        async function handleRestoreLocalBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm("Peringatan! Memulihkan file cadangan akan memperbarui database Firestore. Lanjutkan?")) {
+                event.target.value = '';
+                return;
+            }
+
+            const rdr = new FileReader();
+            rdr.onload = async function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Validate structural boundaries
+                    if (!data.products || !data.portfolios) {
+                        throw new Error("File tidak cocok atau isi format .json rusak.");
+                    }
+
+                    addToast("Menggugah pemulihan data ke Firestore...", "success");
+
+                    // 1. Sync restoring catalog products
+                    for (const row of data.products) {
+                        await dbInst.collection('products').doc(row.id).set(row);
+                    }
+
+                    // 2. Sync restoring portfolios
+                    for (const row of data.portfolios) {
+                        await dbInst.collection('portfolios').doc(row.id).set(row);
+                    }
+
+                    // 3. Sync restoring location settings
+                    if (data.locationSettings) {
+                        await dbInst.collection('location').doc('settings').set(data.locationSettings);
+                        locationSettings = data.locationSettings;
+                        fillLocationInputsData();
+                        updateLeafletTargetPoint();
+                    }
+
+                    // 4. Sync restoring media items gallery
+                    if (data.mediaGallery) {
+                        for (const row of data.mediaGallery) {
+                            await dbInst.collection('media_gallery').doc(row.id).set(row);
+                        }
+                    }
+
+                    addToast("Hebat! Seluruh arsip data berhasil disinkronisasi ke server!", "success");
+                    event.target.value = '';
+                } catch(error) {
+                    console.error("Gagal restore: ", error);
+                    addToast("Sistem pemulihan gagal: " + error.message, "error");
+                    event.target.value = '';
+                }
+            };
+            rdr.readAsText(file);
+        }
+
+
+        // --- MULTIPOSE OVERLAY IMAGE GALLERIES PICKER ---
+        function openGlobalMediaPicker(inputIdTarget) {
+            currentTargetInputId = inputIdTarget;
+            document.getElementById('picker-modal-overlay').classList.remove('hidden');
+            renderPickerGalleryGridItems();
+        }
+
+        function closeGlobalMediaPicker() {
+            document.getElementById('picker-modal-overlay').classList.add('hidden');
+            currentTargetInputId = null;
+        }
+
+        function renderPickerGalleryGridItems() {
+            const grid = document.getElementById('picker-grid-block');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            if (mediaGallery.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-8 text-center text-xs text-slate-400 italic font-medium">
+                        Galeri kosong. Silakan upload berkas baru di menu tab Pustaka Media.
+                    </div>
+                `;
+                return;
+            }
+
+            mediaGallery.forEach(p => {
+                const fixedPath = fixGDriveLink(p.url);
+                const col = document.createElement('div');
+                col.className = 'group relative aspect-square rounded-2xl overflow-hidden border border-slate-150 cursor-pointer hover:border-primary transition-all';
+                col.onclick = () => selectItemFromPicker(fixedPath);
+                col.innerHTML = `
+                    <img src="${fixedPath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                    <div class="absolute bottom-0 inset-x-0 bg-black/60 p-1.5 text-white text-center">
+                        <p class="text-[9px] font-black truncate uppercase leading-none">${p.name}</p>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+        }
+
+        // Filter search items inside picker dialog
+        function searchInPickerGallery(queryTxt) {
+            const filtered = mediaGallery.filter(p => p.name.toLowerCase().includes(queryTxt.toLowerCase()));
+            const grid = document.getElementById('picker-grid-block');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-xs text-slate-400 font-medium italic">Tidak ditemukan "${queryTxt}"</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const fixedPath = fixGDriveLink(p.url);
+                const col = document.createElement('div');
+                col.className = 'group relative aspect-square rounded-2xl overflow-hidden border border-slate-150 cursor-pointer hover:border-primary transition-all';
+                col.onclick = () => selectItemFromPicker(fixedPath);
+                col.innerHTML = `
+                    <img src="${fixedPath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                    <div class="absolute bottom-0 inset-x-0 bg-black/60 p-1.5 text-white text-center">
+                        <p class="text-[9px] font-black truncate uppercase leading-none">${p.name}</p>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+        }
+
+        // Selection confirmed handler
+        function selectItemFromPicker(selectedUrl) {
+            if (!currentTargetInputId) return;
+
+            const inp = document.getElementById(currentTargetInputId);
+            if (inp) {
+                inp.value = selectedUrl;
+                updateVisualPreviewBox(currentTargetInputId, selectedUrl);
+                addToast("Foto pustaka berhasil terpasang!");
+            }
+            closeGlobalMediaPicker();
+        }
+
+        // Rapid picker direct upload file
+        function handlePickerDirectUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const rdr = new FileReader();
+            rdr.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const label = (file.name.split('.')[0] || 'Picker upload').substring(0, 16);
+                const id = 'g_' + Date.now().toString();
+
+                const newItem = { id, name: label, url: base64Url };
+
+                dbInst.collection('media_gallery').doc(id).set(newItem)
+                    .then(() => {
+                        addToast(`Upload berhasil!`, "success");
+                        if (currentTargetInputId) {
+                            selectItemFromPicker(base64Url);
+                        }
+                    })
+                    .catch((err) => {
+                        logFirestoreRuleFailure(err, 'write', 'media_gallery/' + id);
+                        addToast("Gagal mengunggah foto: " + err.message, "error");
+                    });
+            };
+            rdr.readAsDataURL(file);
+        }
+
+
+        // Universal direct file upload to form input preview
+        function handleDirectUploadToInput(e, inputId) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const rdr = new FileReader();
+            rdr.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const label = (file.name.split('.')[0] || 'Direct').substring(0, 16);
+                const id = 'g_' + Date.now().toString();
+
+                // Store in background gallery library automatically for reuse
+                const newItem = { id, name: label, url: base64Url };
+                dbInst.collection('media_gallery').doc(id).set(newItem);
+
+                const inp = document.getElementById(inputId);
+                if (inp) {
+                    inp.value = base64Url;
+                    updateVisualPreviewBox(inputId, base64Url);
+                }
+                addToast("Foto diunggah dan terpasang!", "success");
+            };
+            rdr.readAsDataURL(file);
+        }
+
+        // Form Visual Previews controller
+        function updateVisualPreviewBox(inputId, url) {
+            const previewBox = document.getElementById(inputId + '-preview');
+            if (previewBox) {
+                previewBox.classList.remove('hidden');
+                const img = previewBox.querySelector('img');
+                if (img) img.src = url;
+            }
+        }
+
+        function resetFormPreview(inputId) {
+            const previewBox = document.getElementById(inputId + '-preview');
+            const inp = document.getElementById(inputId);
+            if (previewBox) previewBox.classList.add('hidden');
+            if (inp) inp.value = '';
+        }
+
+
+        // --- GENERAL SYSTEM HELPERS ---
+        // Google Drive link mapping
+        function fixGDriveLink(url) {
+            if (!url) return '';
+            
+            // Try matching /d/FILE_ID
+            let match = url.match(/\/d\/([a-zA-Z0-9_-]{25,})/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            
+            // Try matching id=FILE_ID query parameters
+            match = url.match(/[?&]id=([a-zA-Z0-9_-]{25,})/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            
+            return url;
+        }
+
+        // Format currency helper
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        }
+
+        // Copy value to clipboard helper
+        function copyValueToClipboard(txt, label) {
+            navigator.clipboard.writeText(txt).then(() => {
+                addToast(`Link "${label}" telah disalin ke Clipboard!`, "success");
+            }).catch(() => {
+                const tempIn = document.createElement('input');
+                tempIn.value = txt;
+                document.body.appendChild(tempIn);
+                tempIn.select();
+                document.execCommand('copy');
+                tempIn.remove();
+                addToast(`Link "${label}" disalin ke Clipboard!`, "success");
+            });
+        }
+
+        // Toast notifications alert bubble factory
+        function addToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            const bgClass = type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white';
+
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 px-5 rounded-2xl shadow-xl backdrop-blur-md transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto ${bgClass}`;
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="text-xs font-bold font-sans">${msg}</span>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Trigger enter transition
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            // Auto dismiss timer
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
