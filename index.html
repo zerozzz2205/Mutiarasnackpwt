@@ -14,6 +14,13 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        html { font-size: 16px; }
+        @media (min-width: 1024px) {
+            html { font-size: 14.5px; } /* Scales down entire layout proportionally to ~90% on desktop screen sizes */
+        }
+        @media (min-width: 1440px) {
+            html { font-size: 14px; } /* Refined scale down for extra large premium monitors */
+        }
         body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
