@@ -18,6 +18,16 @@
         .product-card:hover .product-img { transform: scale(1.1); }
         .active-nav { color: #ea580c !important; position: relative; }
         .active-nav::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: #ea580c; border-radius: 99px; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-active {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
         [x-cloak] { display: none !important; }
     </style>
     <script>
@@ -58,21 +68,21 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-8">
-                <div class="hidden md:flex items-center gap-6">
-                    <button onclick="showPage('home')" class="nav-link font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer active-nav" id="nav-home">Beranda</button>
-                    <button onclick="showPage('about')" class="nav-link font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer" id="nav-about">Tentang Kami</button>
+            <div class="flex items-center gap-4 sm:gap-6 lg:gap-8">
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <button onclick="showPage('home')" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer active-nav" id="nav-home">Beranda</button>
+                    <button onclick="showPage('about')" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer" id="nav-about">Tentang Kami</button>
                 </div>
                 
-                <div id="admin-nav-actions" class="hidden flex items-center gap-3">
-                    <button onclick="toggleAdminDashboard(true)" class="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-primary hover:bg-orange-100 transition-colors font-bold text-sm">
-                        <i data-lucide="settings" class="w-4 h-4"></i> <span>Admin</span>
+                <div id="admin-nav-actions" class="hidden flex items-center gap-2 sm:gap-3">
+                    <button onclick="toggleAdminDashboard(true)" class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full bg-orange-50 text-primary hover:bg-orange-100 transition-colors font-bold text-xs sm:text-sm">
+                        <i data-lucide="settings" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> <span class="hidden xs:inline">Admin</span>
                     </button>
                     <button onclick="handleLogout()" class="flex items-center gap-2 p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <i data-lucide="log-out" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                     </button>
                 </div>
-                <div id="guest-nav-info" class="hidden sm:block text-xs text-orange-200 font-medium italic">UMKM Sidoarjo</div>
+                <div id="guest-nav-info" class="hidden md:block text-xs text-orange-400 font-medium italic">UMKM Sidoarjo</div>
             </div>
         </div>
     </nav>
@@ -80,7 +90,7 @@
     <!-- Page: Home -->
     <div id="page-home" class="page-section">
         <!-- Hero -->
-        <section class="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <section class="reveal relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
                 <div class="flex-1 text-center md:text-left">
                     <span class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wider text-primary uppercase bg-orange-100 rounded-full">
@@ -109,7 +119,7 @@
         </section>
 
         <!-- Catalog -->
-        <section id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <section id="catalog" class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
                     <div class="flex items-center gap-2 text-primary mb-2 font-semibold">
@@ -137,7 +147,7 @@
 
     <!-- Page: About Us -->
     <div id="page-about" class="page-section hidden">
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <section class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div class="order-2 md:order-1">
                     <div class="relative">
@@ -181,7 +191,7 @@
     </div>
 
     <!-- Location -->
-    <section id="location" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-orange-100">
+    <section id="location" class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-orange-100">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="space-y-6">
                 <div class="flex items-center gap-2 text-primary font-semibold">
@@ -303,9 +313,13 @@
                             <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Kategori</label>
                             <input required type="text" id="new-category" placeholder="Keripik" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
                         </div>
-                        <div class="space-y-2">
+                        <div class="space-y-2 col-span-1 md:col-span-2">
                             <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Link Foto</label>
                             <input required type="url" id="new-imageUrl" placeholder="https://..." class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                            <p class="text-xs text-orange-600/80 font-medium italic mt-1 flex items-center gap-1">
+                                <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 text-primary"></i> 
+                                Mendukung link Google Drive secara langsung! Cukup salin "Dapatkan Link" (Pilihan: Siapa saja dengan link).
+                            </p>
                         </div>
                         <button type="submit" class="md:col-span-2 mt-4 w-full py-5 bg-primary text-white font-black rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center gap-3">
                             <i data-lucide="plus" class="w-6 h-6"></i> Konfirmasi Data Produk
@@ -323,6 +337,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating WhatsApp Action Button (FAB) -->
+    <a id="whatsapp-fab" href="#" target="_blank" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex items-center gap-2 px-4 py-3 bg-[#25D366] hover:bg-[#20ba59] text-white font-bold rounded-full shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 transition-all duration-300 hover:-translate-y-1 active:scale-95 group">
+        <div class="relative flex h-5 w-5 items-center justify-center">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-45"></span>
+            <i data-lucide="message-circle" class="w-5 h-5 relative z-10"></i>
+        </div>
+        <span class="text-sm tracking-wide">Tanya Kami</span>
+    </a>
 
     <script>
         // --- State ---
@@ -363,7 +386,17 @@
 
             renderProducts();
             renderCategories();
+
+            // Set WhatsApp FAB link dynamically using the WHATSAPP_NUMBER template
+            const fab = document.getElementById('whatsapp-fab');
+            if (fab) {
+                fab.href = `https://wa.me/${WHATSAPP_NUMBER}?text=Halo Mutiara Snack, saya ingin bertanya mengenai pemesanan atau info lebih lanjut mengenai produk Bapak/Ibu...`;
+            }
+
             lucide.createIcons();
+            
+            // Initialize Scroll Reveal Animations
+            initScrollReveal();
             
             // Hidden Portal Trigger
             document.getElementById('logo-trigger').addEventListener('click', handleLogoClick);
@@ -373,13 +406,39 @@
         function fixGDriveLink(url) {
             if (!url) return '';
             
-            // Handle standard sharing links
-            const driveMatch = url.match(/\/(?:d|file\/d|open\?id=)([\w-]{25,})/);
-            if (driveMatch && driveMatch[1]) {
-                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            // Try matching /d/FILE_ID
+            let match = url.match(/\/d\/([a-zA-Z0-9_-]{25,})/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            
+            // Try matching id=FILE_ID query parameters
+            match = url.match(/[?&]id=([a-zA-Z0-9_-]{25,})/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
             }
             
             return url;
+        }
+
+        function initScrollReveal() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -80px 0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
         }
 
         function showPage(pageId) {
@@ -389,9 +448,25 @@
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active-nav'));
             
             // Show target section
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                
+                // Reset and trigger smooth scroll-reveal again for matching elements on load
+                targetPage.querySelectorAll('.reveal').forEach(el => {
+                    el.classList.remove('reveal-active');
+                });
+            }
+
+            // Also reset general elements like location on section changes
+            const locationSec = document.getElementById('location');
+            if (locationSec) {
+                locationSec.classList.remove('reveal-active');
+            }
+            
             // Add active style to nav link
-            document.getElementById(`nav-${pageId}`).classList.add('active-nav');
+            const navBtn = document.getElementById(`nav-${pageId}`);
+            if (navBtn) navBtn.classList.add('active-nav');
             
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
