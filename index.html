@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS & JS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -70,8 +73,9 @@
             
             <div class="flex items-center gap-4 sm:gap-6 lg:gap-8">
                 <div class="flex items-center gap-4 sm:gap-6">
-                    <button onclick="showPage('home')" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer active-nav" id="nav-home">Beranda</button>
-                    <button onclick="showPage('about')" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer" id="nav-about">Tentang Kami</button>
+                    <button onclick="goToHome()" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer active-nav" id="nav-home">Beranda</button>
+                    <button onclick="goToPackages()" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer" id="nav-packages">Paket Katering</button>
+                    <button onclick="goToAbout()" class="nav-link text-sm sm:text-base font-bold text-gray-600 hover:text-primary transition-colors cursor-pointer" id="nav-about">Tentang Kami</button>
                 </div>
                 
                 <div id="admin-nav-actions" class="hidden flex items-center gap-2 sm:gap-3">
@@ -143,6 +147,250 @@
                 <p class="text-gray-400 font-medium italic text-lg">Maaf, kategori ini belum tersedia untuk saat ini.</p>
             </div>
         </section>
+
+        <!-- Section: Packages (Paket Katering Bento) -->
+        <section id="packages-section" class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-orange-100">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="inline-block px-4 py-1.5 mb-4 text-sm font-bold tracking-wider text-primary uppercase bg-orange-100 rounded-full">
+                    Katering & Nasi Kotak Mutiara Snack
+                </span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-950 italic leading-tight">
+                    Pilihan Paket <span class="text-primary">Hemat & Praktis</span>
+                </h2>
+                <p class="text-lg text-gray-600 mt-4 leading-relaxed italic">
+                    Didesain khusus untuk memenuhi kebutuhan berbagai macam acara Anda, mulai dari kumpul santai hingga rapat formal premium.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-6">
+                
+                <!-- TIER 1: Paket Hemat -->
+                <div class="bg-white rounded-[2.5rem] border border-orange-100 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group">
+                    <div class="p-8 pb-4 flex flex-col items-center">
+                        <div class="bg-blue-600 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase px-8 py-2 rounded-xl mb-4 shadow-md">
+                            TIER 1
+                        </div>
+                        <h3 class="text-3xl font-black text-blue-600 tracking-tight italic">Paket Hemat</h3>
+                        <span class="text-sm font-black text-gray-800 uppercase tracking-widest mt-1 mb-6">Basic</span>
+                        
+                        <div class="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-inner border border-gray-100 mb-6 relative">
+                            <img src="https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&q=80&w=500" alt="Paket Hemat" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+
+                        <div class="w-full bg-blue-600 text-center py-3.5 px-4 rounded-xl mb-6 shadow-md shadow-blue-100">
+                            <span class="text-white font-extrabold text-lg sm:text-xl">Rp 10.000 - Rp 13.000</span>
+                        </div>
+
+                        <!-- Checklists -->
+                        <div class="w-full space-y-4 px-2 mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">1 bungkus nasi</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">1 ayam geprek / lauk utama</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">sambal gurih</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">orek tempe & wadah styrofoam</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Footer Segment -->
+                    <div>
+                        <div class="bg-blue-600 text-white py-4 px-6 text-center text-xs sm:text-sm font-bold tracking-wide flex items-center justify-center gap-2">
+                            <i data-lucide="user" class="w-4 h-4 text-white"></i>
+                            <span>Target: Pelajar, Remaja, price sensitive</span>
+                        </div>
+                        <div class="p-6 bg-blue-50/50 border-t border-gray-100">
+                            <a href="https://wa.me/628123456789?text=Halo Mutiara Snack, saya ingin memesan Paket Hemat (Basic) katering bento..." target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i> Pesan Paket Hemat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 2: Paket Pas (Best Seller with visual star!) -->
+                <div class="bg-white rounded-[2.5rem] border-2 border-violet-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group scale-105 z-10 shadow-xl shadow-violet-100">
+                    <!-- Rotating Gold Star indicator -->
+                    <div class="absolute top-4 right-4 z-20 bg-yellow-400 text-white p-2.5 rounded-full shadow-lg border border-white animate-bounce">
+                        <i data-lucide="star" class="w-6 h-6 text-white fill-white"></i>
+                    </div>
+
+                    <div class="p-8 pb-4 flex flex-col items-center">
+                        <div class="bg-violet-700 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase px-8 py-2 rounded-xl mb-4 shadow-md">
+                            TIER 2
+                        </div>
+                        <h3 class="text-3xl font-black text-violet-700 tracking-tight italic">Paket Pas</h3>
+                        <span class="text-sm font-black text-yellow-500 uppercase tracking-widest mt-1 mb-6 flex items-center gap-1">
+                             ★ Best Seller
+                        </span>
+                        
+                        <div class="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-inner border border-gray-100 mb-6 relative">
+                            <img src="https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&q=80&w=500" alt="Paket Pas" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+
+                        <div class="w-full bg-violet-700 text-center py-3.5 px-4 rounded-xl mb-6 shadow-md shadow-violet-100">
+                            <span class="text-white font-extrabold text-lg sm:text-xl">Rp 15.000 - Rp 18.000</span>
+                        </div>
+
+                        <!-- Checklists -->
+                        <div class="w-full space-y-4 px-2 mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-violet-50 text-violet-700 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">1 bungkus nasi</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-violet-50 text-violet-700 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">1 ayam geprek / lauk utama</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-violet-50 text-violet-700 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">Sayur sehat tanpa kuah</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-violet-50 text-violet-700 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">Lauk tambahan & wadah box kardus</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Footer Segment -->
+                    <div>
+                        <div class="bg-violet-700 text-white py-4 px-6 text-center text-xs sm:text-sm font-bold tracking-wide flex items-center justify-center gap-2">
+                            <i data-lucide="users" class="w-4 h-4 text-white"></i>
+                            <span>Target: Mayoritas, EO Kampus, Acara sosial</span>
+                        </div>
+                        <div class="p-6 bg-violet-50 border-t border-gray-100">
+                            <a href="https://wa.me/628123456789?text=Halo Mutiara Snack, saya ingin memesan Paket Pas (Best Seller) katering bento..." target="_blank" class="w-full py-3.5 bg-violet-700 hover:bg-violet-800 text-white text-sm font-black rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i> Pesan Paket Pas ⭐
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 3: Paket Executive -->
+                <div class="bg-white rounded-[2.5rem] border border-orange-100 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group">
+                    <div class="p-8 pb-4 flex flex-col items-center">
+                        <div class="bg-slate-900 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase px-8 py-2 rounded-xl mb-4 shadow-md">
+                            TIER 3
+                        </div>
+                        <h3 class="text-3xl font-black text-slate-950 tracking-tight italic">Paket Executive</h3>
+                        <span class="text-sm font-black text-slate-600 uppercase tracking-widest mt-1 mb-6">Premium</span>
+                        
+                        <div class="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-inner border border-gray-100 mb-6 relative">
+                            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=500" alt="Paket Executive" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+
+                        <div class="w-full bg-slate-950 text-center py-3.5 px-4 rounded-xl mb-6 shadow-md shadow-slate-100">
+                            <span class="text-white font-extrabold text-lg sm:text-xl">Mulai Rp 25.000</span>
+                        </div>
+
+                        <!-- Checklists -->
+                        <div class="w-full space-y-4 px-2 mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-slate-100 text-slate-900 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">1 lauk premium + 2 lauk tambahan</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-slate-100 text-slate-900 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">Sayuran premium dengan kuah sup</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-slate-100 text-slate-900 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">Air Mineral Botol gratis</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-slate-100 text-slate-900 rounded-full">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="text-gray-700 font-bold text-sm">Gratis berbagai jenis kerupuk renyah</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Footer Segment -->
+                    <div>
+                        <div class="bg-slate-950 text-white py-4 px-6 text-center text-xs sm:text-sm font-bold tracking-wide flex items-center justify-center gap-2">
+                            <i data-lucide="crown" class="w-4 h-4 text-yellow-400"></i>
+                            <span>Target: Instansi Pemerintah, Kampus formal</span>
+                        </div>
+                        <div class="p-6 bg-slate-50 border-t border-gray-100">
+                            <a href="https://wa.me/628123456789?text=Halo Mutiara Snack, saya ingin memesan Paket Executive (Premium) katering bento..." target="_blank" class="w-full py-3 bg-slate-900 hover:bg-slate-950 text-white text-sm font-extrabold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i> Pesan Paket Executive
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section: Portofolio & Dokumentasi Pesanan -->
+        <section id="portfolio-section" class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-orange-100">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 text-primary mb-2 font-semibold">
+                        <i data-lucide="award" class="w-5 h-5 animate-pulse"></i>
+                        <span class="text-xs sm:text-sm font-bold tracking-widest uppercase">Portofolio & Rekam Jejak Acara</span>
+                    </div>
+                    <h3 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-950 italic leading-tight">
+                        Dokumentasi Pesanan <span class="text-primary">& Testimoni</span>
+                    </h3>
+                    <p class="text-gray-600 mt-2 italic max-w-2xl text-sm sm:text-base">
+                        Dedikasi harian kami melayani paket katering bento, nasi kotak mewah, tumpeng syukuran, hingga snack box premium untuk berbagai instansi dan keluarga.
+                    </p>
+                </div>
+                
+                <!-- Carousel Navigation Arrows -->
+                <div class="flex items-center gap-3 self-end md:self-auto">
+                    <button onclick="scrollPortfolio('left')" class="p-4 rounded-2xl bg-white border-2 border-orange-100 text-gray-700 hover:text-primary hover:border-primary transition-all active:scale-95 cursor-pointer shadow-md">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="scrollPortfolio('right')" class="p-4 rounded-2xl bg-white border-2 border-orange-100 text-gray-700 hover:text-primary hover:border-primary transition-all active:scale-95 cursor-pointer shadow-md">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carousel Wrapper container -->
+            <div id="portfolio-carousel" class="flex gap-8 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth">
+                <!-- Portfolios will be injected dynamically -->
+            </div>
+
+            <!-- Dots Indicators -->
+            <div id="portfolio-dots" class="flex justify-center items-center gap-2 mt-4 font-bold">
+                <!-- Dots will be injected dynamically -->
+            </div>
+        </section>
     </div>
 
     <!-- Page: About Us -->
@@ -207,16 +455,21 @@
                         <div class="p-2 bg-orange-100 text-primary rounded-xl">
                             <i data-lucide="map-pin" class="w-5 h-5"></i>
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <p class="font-bold text-gray-900">Alamat Lengkap</p>
-                            <p class="text-sm text-gray-600">Jl. Niaga Utama No. 12, Waru, Sidoarjo, Jawa Timur</p>
+                            <p id="outlet-address" class="text-sm text-gray-600">Jl. Niaga Utama No. 12, Waru, Sidoarjo, Jawa Timur</p>
                         </div>
                     </div>
+                    <!-- Directions button -->
+                    <a id="get-directions-btn" href="#" target="_blank" class="inline-flex items-center gap-2.5 px-6 py-4 bg-primary hover:bg-secondary text-white font-extrabold rounded-2xl shadow-xl shadow-orange-100 font-bold transition-all hover:-translate-y-0.5 w-full sm:w-auto justify-center">
+                        <i data-lucide="navigation" class="w-5 h-5"></i>
+                        <span>Petunjuk Arah</span>
+                    </a>
                 </div>
             </div>
             
-            <div class="rounded-[3rem] overflow-hidden shadow-2xl h-[400px] border-4 border-white grayscale hover:grayscale-0 transition-all duration-500">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15827.643864700055!2d112.7208885!3d-7.363842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb905186b515%3A0xc3f8b030438c7f12!2sWaru%2C%20Sidoarjo%20Regency%2C%20East%20Java!5e0!3m2!1sen!2sid!4v1714900000000!5m2!1sen!2sid" class="w-full h-full border-0" allowfullscreen="" loading="lazy"></iframe>
+            <div class="rounded-[3rem] overflow-hidden shadow-2xl h-[400px] border-4 border-white grayscale hover:grayscale-0 transition-all duration-500 relative z-20">
+                <div id="interactive-map" class="w-full h-full"></div>
             </div>
         </div>
     </section>
@@ -293,6 +546,144 @@
             </div>
 
             <div class="p-10 overflow-y-auto scrollbar-hide flex-1">
+                <!-- Google Drive Photo Integration & Backup Tool -->
+                <div class="mb-14 bg-gradient-to-br from-orange-50 to-orange-100/40 p-6 sm:p-8 rounded-[2rem] border border-orange-100 shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                            <i data-lucide="cloud" class="w-6 h-6"></i>
+                        </div>
+                        Asisten Media & Backup Data
+                    </h3>
+                    
+                    <p class="text-xs sm:text-sm text-gray-600 mb-6 leading-relaxed">
+                        Gunakan pustaka media di bawah ini untuk mengunggah foto lokal langsung dari HP/komputer atau mendaftarkan link Google Drive agar bisa langsung Anda pilih saat menambahkan produk dan portofolio pesanan!
+                    </p>
+
+                    <!-- Nav tabs for utility tools -->
+                    <div class="flex flex-wrap gap-1 p-1 bg-gray-100 rounded-2xl mb-6">
+                        <button type="button" onclick="switchUtilityTab('gallery')" id="tab-utility-gallery" class="flex-1 min-w-[120px] py-3 text-xs font-black rounded-lg transition-all bg-white text-gray-950 shadow-sm cursor-pointer">
+                            Pustaka Foto & Media
+                        </button>
+                        <button type="button" onclick="switchUtilityTab('tester')" id="tab-utility-tester" class="flex-1 min-w-[120px] py-3 text-xs font-black rounded-lg transition-all text-gray-500 hover:text-gray-900 cursor-pointer">
+                            Google Drive Konverter
+                        </button>
+                        <button type="button" onclick="switchUtilityTab('backup')" id="tab-utility-backup" class="flex-1 min-w-[120px] py-3 text-xs font-black rounded-lg transition-all text-gray-500 hover:text-gray-900 cursor-pointer">
+                            Backup & Restore File
+                        </button>
+                    </div>
+
+                    <!-- Panel 0: Pustaka Foto & Media (NEW) -->
+                    <div id="panel-utility-gallery" class="space-y-6">
+                        <!-- Direct upload option and register links together -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Left: Upload direct device image -->
+                            <div class="p-5 bg-white rounded-2xl border border-orange-100/50 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-xs font-black text-gray-900 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                        <i data-lucide="upload-cloud" class="w-4 h-4 text-primary"></i> Upload Foto Perangkat
+                                    </h4>
+                                    <p class="text-[11px] text-gray-500 leading-normal mb-3">Unggah foto masakan langsung dari galeri HP atau komputer Anda.</p>
+                                </div>
+                                <label class="w-full py-3 bg-primary hover:bg-secondary text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-colors text-center">
+                                    <i data-lucide="image" class="w-4 h-4"></i> Pilih File Foto
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleLocalFileGalleryUpload(event)">
+                                </label>
+                            </div>
+
+                            <!-- Right: Add link manually to library -->
+                            <form onsubmit="handleRegisterGalleryLink(event)" class="p-5 bg-white rounded-2xl border border-orange-100/50 flex flex-col gap-3">
+                                <h4 class="text-xs font-black text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i data-lucide="link" class="w-4 h-4 text-primary"></i> Daftarkan Link Foto
+                                </h4>
+                                <input required type="text" id="reg-gallery-name" placeholder="Nama Label Foto (misal: Tumpeng Premium)" class="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-150 focus:border-primary focus:bg-white outline-none text-xs font-medium">
+                                <div class="flex gap-2">
+                                    <input required type="url" id="reg-gallery-url" placeholder="https://drive.google.com/..." class="flex-1 px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-150 focus:border-primary focus:bg-white outline-none text-xs font-medium">
+                                    <button type="submit" class="px-4 py-2.5 bg-orange-850 hover:bg-orange-950 text-white font-black text-xs rounded-xl transition-colors shrink-0">
+                                        Daftar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Gallery items selector list grid -->
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.15em] flex justify-between items-center">
+                                <span>Pustaka Foto Tersimpan (<span id="gallery-count">0</span>)</span>
+                                <span class="text-[10px] text-primary/80 lowercase italic font-bold">klik foto untuk salin link</span>
+                            </h4>
+                            <div id="gallery-items-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-60 overflow-y-auto pr-1 scrollbar-hide py-1">
+                                <!-- Dynamically loaded gallery items -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 1: Google Drive Tester & Converter -->
+                    <div id="panel-utility-tester" class="hidden space-y-4">
+                        <div class="p-4 bg-white/80 rounded-xl text-xs space-y-2 border border-orange-100/50">
+                            <p class="font-extrabold text-orange-950 uppercase tracking-widest flex items-center gap-1.5">
+                                <i data-lucide="help-circle" class="w-4 h-4 text-primary"></i> Panduan Foto Google Drive:
+                            </p>
+                            <ol class="list-decimal pl-4 text-gray-600 space-y-1 font-medium">
+                                <li>Upload foto produk ke Google Drive milik Anda sendiri.</li>
+                                <li>Klik kanan pada foto di Google Drive -> pilih <b>Bagikan (Share)</b>.</li>
+                                <li>Ubah Akses Umum menjadi <b>Siapa saja yang memiliki link (Anyone with link)</b>.</li>
+                                <li>Salin Link (Copy Link) dan paste ke kolom uji coba di bawah ini untuk mendapatkan URL gambar langsung.</li>
+                            </ol>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tempel Link Bagikan Google Drive</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="gdrive-test-url" placeholder="https://drive.google.com/file/d/..." class="flex-1 px-4 py-3.5 rounded-xl bg-white border-2 border-orange-50 focus:border-primary outline-none transition-all text-xs font-medium">
+                                <button type="button" onclick="convertAndPreviewGDrive()" class="px-5 py-3.5 bg-primary hover:bg-secondary text-white font-extrabold rounded-xl text-xs transition-colors shadow-md cursor-pointer">
+                                    Tes & Pratinjau
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Sandbox -->
+                        <div id="gdrive-preview-box" class="hidden p-5 bg-white rounded-2xl border border-gray-150 flex flex-col items-center gap-3">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] self-start">Hasil Pratinjau Foto</p>
+                            <div class="relative w-full aspect-[16/9] max-h-44 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                <img id="gdrive-preview-img" src="" class="w-full h-full object-cover" onerror="if(window.handleGDrivePreviewError) handleGDrivePreviewError()">
+                            </div>
+                            <div class="w-full space-y-3 text-xs">
+                                <p class="text-green-700 font-bold flex items-center gap-1">
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-green-650"></i> Link langsung berhasil dikonversi!
+                                </p>
+                                <input readonly type="text" id="gdrive-direct-url" class="w-full p-2.5 bg-gray-50 text-gray-650 font-mono text-[10px] rounded-lg border border-gray-100 select-all" onclick="this.select()">
+                                <div class="flex flex-col sm:flex-row gap-2 mt-2">
+                                    <button type="button" onclick="applyGDriveDirectLink('new-imageUrl')" class="flex-1 py-2 px-3 bg-orange-850 hover:bg-orange-900 text-white font-extrabold rounded-lg text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                        <i data-lucide="package" class="w-3.5 h-3.5"></i> Gunakan Untuk Produk
+                                    </button>
+                                    <button type="button" onclick="applyGDriveDirectLink('port-imageUrl')" class="flex-1 py-2 px-3 bg-orange-850 hover:bg-orange-900 text-white font-extrabold rounded-lg text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                        <i data-lucide="award" class="w-3.5 h-3.5"></i> Gunakan Untuk Portofolio
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: Backup & Restore (Create File Khusus Foto/Data) -->
+                    <div id="panel-utility-backup" class="hidden space-y-4">
+                        <p class="text-xs text-gray-600 font-medium leading-relaxed">
+                            Buat dan unduh semua data dokumentasi foto bersama katalog produk Anda ke komputer Anda dalam bentuk file <b class="text-orange-950 font-bold">.json</b> khusus agar rekam jejak aman dari kehilangan data, atau unggah file backup Anda kapan saja.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <button type="button" onclick="downloadBackupDataFile()" class="p-5 bg-white hover:bg-orange-50/50 text-primary border-2 border-orange-100 font-bold rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2 shadow-sm text-center cursor-pointer">
+                                <i data-lucide="download" class="w-6 h-6 text-primary"></i>
+                                <span class="font-extrabold">Unduh File Back-up (.json)</span>
+                            </button>
+                            <label class="p-5 bg-white hover:bg-orange-50/50 text-primary border-2 border-orange-100 border-dashed font-bold rounded-2xl text-xs transition-all flex flex-col items-center justify-center gap-2 shadow-sm text-center cursor-pointer">
+                                <i data-lucide="upload" class="w-6 h-6 text-primary"></i>
+                                <span class="font-extrabold">Unggah File Kelola (.json)</span>
+                                <input type="file" id="gdrive-backup-uploader" accept=".json" class="hidden" onchange="uploadBackupDataFile(event)">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mb-14">
                     <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
                         <div class="w-10 h-10 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
@@ -314,17 +705,138 @@
                             <input required type="text" id="new-category" placeholder="Keripik" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
                         </div>
                         <div class="space-y-2 col-span-1 md:col-span-2">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Link Foto</label>
-                            <input required type="url" id="new-imageUrl" placeholder="https://..." class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
-                            <p class="text-xs text-orange-600/80 font-medium italic mt-1 flex items-center gap-1">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Link atau Upload Foto Produk</label>
+                                <button type="button" onclick="openMediaPicker('new-imageUrl')" class="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="images" class="w-3.5 h-3.5"></i> Pilih dari Pustaka 
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <input required type="text" id="new-imageUrl" placeholder="Hubungkan link foto (https://...) atau pilih berkas" class="flex-1 px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                                <button type="button" onclick="openMediaPicker('new-imageUrl')" class="px-5 bg-orange-100 hover:bg-orange-200 text-primary rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-sm" title="Pilih dari Pustaka">
+                                    <i data-lucide="images" class="w-5 h-5"></i>
+                                </button>
+                                <label class="px-5 bg-orange-850 hover:bg-orange-950 text-white rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-sm relative" title="Upload Foto Langsung">
+                                    <i data-lucide="upload" class="w-5 h-5"></i>
+                                    <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFormDirectUpload(event, 'new-imageUrl')">
+                                </label>
+                            </div>
+                            <div id="new-imageUrl-preview" class="hidden relative w-20 h-20 rounded-2xl overflow-hidden border border-orange-200 mt-2">
+                                <img src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearFormImagePreview('new-imageUrl')" class="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full"><i data-lucide="x" class="w-3 h-3"></i></button>
+                            </div>
+                            <p class="text-[11px] text-orange-650/80 font-bold italic mt-1 flex items-center gap-1">
                                 <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 text-primary"></i> 
-                                Mendukung link Google Drive secara langsung! Cukup salin "Dapatkan Link" (Pilihan: Siapa saja dengan link).
+                                Tips: Pilih dari pustaka, upload langsung foto dari HP, atau tempel link Google Drive.
                             </p>
                         </div>
                         <button type="submit" class="md:col-span-2 mt-4 w-full py-5 bg-primary text-white font-black rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center gap-3">
                             <i data-lucide="plus" class="w-6 h-6"></i> Konfirmasi Data Produk
                         </button>
                     </form>
+                </div>
+
+                <!-- Admin Map & Location Settings -->
+                <div class="mb-14 border-t border-orange-100 pt-10">
+                    <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                            <i data-lucide="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        Pengaturan Lokasi & Google Maps
+                    </h3>
+                    <form onsubmit="handleSaveLocation(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 col-span-1 md:col-span-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Alamat Lengkap Outlet</label>
+                            <input required type="text" id="config-address" placeholder="Jl. Niaga Utama No. 12, Waru, Sidoarjo, Jawa Timur" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Latitude (Koordinat Lintang)</label>
+                            <input required type="number" step="any" id="config-lat" placeholder="-7.3486" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Longitude (Koordinat Lintang/Bujur)</label>
+                            <input required type="number" step="any" id="config-lng" placeholder="112.7231" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2 col-span-1 md:col-span-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Link Petunjuk Arah (Tautan Langsung Google Maps)</label>
+                            <input required type="url" id="config-gmaps" placeholder="https://maps.google.com/?q=-7.3486,112.7231" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                            <p class="text-xs text-orange-600/80 font-medium italic mt-1 flex items-center gap-1">
+                                <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 text-primary"></i> 
+                                Link ini akan langsung terbuka di perangkat pelanggan saat menekan tombol "Petunjuk Arah".
+                            </p>
+                        </div>
+                        <button type="submit" class="md:col-span-2 w-full py-4 bg-orange-800 hover:bg-orange-950 text-white font-black rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center gap-3 transition-colors">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Pengaturan Lokasi
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Portfolio & Testimonial Settings -->
+                <div class="mb-14 border-t border-orange-100 pt-10">
+                    <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        Tambah Dokumentasi & Testimoni
+                    </h3>
+                    <form onsubmit="handleAddPortfolio(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 col-span-1 md:col-span-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Judul Acara / Pesanan</label>
+                            <input required type="text" id="port-title" placeholder="Contoh: Nasi Box Korporasi Mandiri" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2 col-span-1 md:col-span-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Detail Pesanan / Menu</label>
+                            <input required type="text" id="port-details" placeholder="Contoh: 150 Box Bento dengan Lauk Ayam Bakar, Capcay, Sambal" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2 col-span-1 md:col-span-2">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Link atau Upload Foto Dokumentasi</label>
+                                <button type="button" onclick="openMediaPicker('port-imageUrl')" class="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="images" class="w-3.5 h-3.5"></i> Pilih dari Pustaka 
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <input required type="text" id="port-imageUrl" placeholder="Hubungkan link foto (https://...) atau pilih berkas" class="flex-1 px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                                <button type="button" onclick="openMediaPicker('port-imageUrl')" class="px-5 bg-orange-100 hover:bg-orange-200 text-primary rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-sm" title="Pilih dari Pustaka">
+                                    <i data-lucide="images" class="w-5 h-5"></i>
+                                </button>
+                                <label class="px-5 bg-orange-850 hover:bg-orange-950 text-white rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-sm relative" title="Upload Foto Langsung">
+                                    <i data-lucide="upload" class="w-5 h-5"></i>
+                                    <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFormDirectUpload(event, 'port-imageUrl')">
+                                </label>
+                            </div>
+                            <div id="port-imageUrl-preview" class="hidden relative w-20 h-20 rounded-2xl overflow-hidden border border-orange-200 mt-2">
+                                <img src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearFormImagePreview('port-imageUrl')" class="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full"><i data-lucide="x" class="w-3 h-3"></i></button>
+                            </div>
+                            <p class="text-[11px] text-orange-650/80 font-bold italic mt-1 flex items-center gap-1">
+                                <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 text-primary"></i> 
+                                Tips: Pilih dari pustaka, upload langsung foto dari HP, atau tempel link Google Drive.
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Nama Klien / Instansi</label>
+                            <input required type="text" id="port-client" placeholder="Contoh: Ibu Farah - Divisi HRD Mandiri" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Pemberian Testimoni Klien</label>
+                            <textarea required id="port-testimonial" rows="2" placeholder="Tulis masukan, kesan atau testimoni klien di sini..." class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-50 focus:border-primary focus:bg-white outline-none transition-all text-sm font-medium resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="md:col-span-2 w-full py-4 bg-orange-800 hover:bg-orange-950 text-white font-black rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center gap-3 transition-colors">
+                            <i data-lucide="plus" class="w-5 h-5"></i> Tambah Dokumentasi & Testimoni
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Portfolio List -->
+                <div class="mb-14 border-t border-orange-100 pt-10">
+                    <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-100 text-primary rounded-xl flex items-center justify-center">
+                            <i data-lucide="award" class="w-5 h-5"></i>
+                        </div>
+                        Dokumentasi Pesanan Aktif (<span id="admin-portfolio-count">0</span>)
+                    </h3>
+                    <div id="admin-portfolio-list" class="space-y-3 mb-10"></div>
                 </div>
 
                 <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
@@ -347,24 +859,113 @@
         <span class="text-sm tracking-wide">Tanya Kami</span>
     </a>
 
+    <!-- Media Picker Modal (Popup Overlay) -->
+    <div id="media-picker-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm shadow-2xl" onclick="closeMediaPicker()"></div>
+        <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden max-h-[85vh] flex flex-col border border-orange-100 animate-fade-in">
+            <div class="bg-orange-850 p-6 text-white flex items-center justify-between shadow-md">
+                <div>
+                    <h4 class="text-xl font-black italic flex items-center gap-2">
+                        <i data-lucide="images" class="w-5 h-5 text-orange-200"></i> Pilih Foto Pustaka
+                    </h4>
+                    <p class="text-[10px] text-orange-200 uppercase font-extrabold tracking-widest mt-0.5">Mutiara Snack Gallery</p>
+                </div>
+                <button onclick="closeMediaPicker()" class="bg-white/10 hover:bg-white/20 p-2.5 rounded-xl transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 bg-orange-50/20 border-b border-orange-100/60 flex gap-2">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input type="text" id="gallery-picker-search" oninput="searchPickerGallery()" placeholder="Cari foto di pustaka..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-orange-150 focus:border-primary outline-none text-xs font-semibold">
+                </div>
+                <label class="px-4 py-3 bg-primary hover:bg-secondary text-white rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm shrink-0">
+                    <i data-lucide="upload" class="w-4 h-4"></i> Upload Baru
+                    <input type="file" accept="image/*" class="hidden" onchange="handlePickerDirectUpload(event)">
+                </label>
+            </div>
+
+            <div class="p-6 overflow-y-auto scrollbar-hide flex-1 bg-gray-50/50">
+                <div id="picker-items-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <!-- Dynamic Gallery items will be populated here -->
+                </div>
+            </div>
+            
+            <div class="p-4 bg-orange-50/30 border-t border-orange-100 flex justify-end">
+                <button type="button" onclick="closeMediaPicker()" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-extrabold rounded-lg text-xs transition-colors cursor-pointer">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- State ---
         let products = [];
+        let portfolios = [];
+        let mediaGallery = [];
         let isAuthenticated = false;
         let activeCategory = 'Semua';
         let logoClickCount = 0;
         let clickTimer = null;
+        let currentActivePickerTarget = null; // Target form input ID (e.g., 'new-imageUrl' or 'port-imageUrl')
+
+        // Leaflet Map State
+        let mapInstance = null;
+        let mapMarker = null;
+        let locationSettings = {
+            address: "Jl. Niaga Utama No. 12, Waru, Sidoarjo, Jawa Timur",
+            lat: -7.363842,
+            lng: 112.720888,
+            gmapsUrl: "https://www.google.com/maps/dir/?api=1&destination=-7.363842,112.720888"
+        };
 
         const STORAGE_KEY = 'mutiara_snack_products';
         const AUTH_KEY = 'mutiara_snack_auth';
+        const LOCATION_KEY = 'mutiara_snack_location_v1';
+        const PORTFOLIO_KEY = 'mutiara_snack_portfolio_v1';
+        const MEDIAGALLERY_KEY = 'mutiara_snack_media_gallery_v1';
         const ADMIN_PASSWORD = 'Mutiara2026';
         const WHATSAPP_NUMBER = '628123456789';
+
+        const INITIAL_GALLERY = [
+            { id: 'g1', name: 'Snack Box Arisan', url: 'https://images.unsplash.com/photo-1621932953986-15fcfec79685?auto=format&fit=crop&q=80&w=500' },
+            { id: 'g2', name: 'Nasi Tumpeng Kuning', url: 'https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&q=80&w=500' },
+            { id: 'g3', name: 'Nasi Box Premium', url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=500' },
+            { id: 'g4', name: 'Keripik Singkong Balado', url: 'https://images.unsplash.com/photo-1600271886399-52316aff0dfc?auto=format&fit=crop&q=80&w=500' }
+        ];
 
         const INITIAL_PRODUCTS = [
             { id: '1', name: 'Keripik Tempe Renyah', price: 15000, category: 'Keripik', imageUrl: 'https://images.unsplash.com/photo-1621932953986-15fcfec79685?auto=format&fit=crop&q=80&w=400' },
             { id: '2', name: 'Kacang Telur Spesial', price: 20000, category: 'Kacang', imageUrl: 'https://images.unsplash.com/photo-1599599810694-b5d438096345?auto=format&fit=crop&q=80&w=400' },
             { id: '3', name: 'Peyek Kacang Gurih', price: 12000, category: 'Peyek', imageUrl: 'https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?auto=format&fit=crop&q=80&w=400' },
             { id: '4', name: 'Keripik Singkong Pedas', price: 15000, category: 'Keripik', imageUrl: 'https://images.unsplash.com/photo-1600271886399-52316aff0dfc?auto=format&fit=crop&q=80&w=400' }
+        ];
+
+        const INITIAL_PORTFOLIOS = [
+            {
+                id: 'p1',
+                title: 'Nasi Box Korporasi Mandiri',
+                details: '120 Box Paket Bento dengan Menu Ayam Panggang Madu & Capcay Bakso.',
+                imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=500',
+                clientName: 'Ibu Farah - Divisi HRD Bank Mandiri',
+                testimonial: 'Rasa masakannya luar biasa mantap, bumbu ayam panggang madunya super meresap. Kotakan dikemas rapi, higienis, dan tepat waktu sekali dikirim!'
+            },
+            {
+                id: 'p2',
+                title: 'Menu Tumpeng Syukuran Kantor',
+                details: '2 Paket Tumpeng Kuning Komplit hiasan sayur premium porsi 30 orang.',
+                imageUrl: 'https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&q=80&w=500',
+                clientName: 'Bpk. Rian - EO Ruang Kreasi Sidoarjo',
+                testimonial: 'Tumpengnya nampak sangat mewah, cantik, dan meriah untuk memeriahkan syukuran kantor baru kami. Nasinya gurih pulen, sambal mutiaranya juara!'
+            },
+            {
+                id: 'p3',
+                title: 'Snack Box Premium Arisan Keluarga',
+                details: '85 Box Snack isi Pastel Premium, Lemper Ayam, dan Risol Mayo.',
+                imageUrl: 'https://images.unsplash.com/photo-1621932953986-15fcfec79685?auto=format&fit=crop&q=80&w=500',
+                clientName: 'Ibu Shinta - Perumahan Graha Indah',
+                testimonial: 'Semua tamu memuji jajanannya yang lezat dan premium, terutama pastelnya yang super renyah serta isiannya yang padat. Kontak WA Ibu Triyanti langsung laris di grup arisan!'
+            }
         ];
 
         // --- Core Functions ---
@@ -384,8 +985,34 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
             }
 
+            // Load Portfolios
+            const savedPort = localStorage.getItem(PORTFOLIO_KEY);
+            if (savedPort) {
+                portfolios = JSON.parse(savedPort);
+            } else {
+                portfolios = INITIAL_PORTFOLIOS;
+                localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(portfolios));
+            }
+
+            // Load Media Gallery
+            const savedGallery = localStorage.getItem(MEDIAGALLERY_KEY);
+            if (savedGallery) {
+                mediaGallery = JSON.parse(savedGallery);
+            } else {
+                mediaGallery = INITIAL_GALLERY;
+                localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+            }
+
+            // Load Location Settings
+            loadLocationSettings();
+
             renderProducts();
             renderCategories();
+            renderPortfolios();
+            renderMediaGallery();
+            
+            // Initialize portfolio mouse drag controls
+            initPortfolioDragScroll();
 
             // Set WhatsApp FAB link dynamically using the WHATSAPP_NUMBER template
             const fab = document.getElementById('whatsapp-fab');
@@ -397,9 +1024,117 @@
             
             // Initialize Scroll Reveal Animations
             initScrollReveal();
+
+            // Initialize Map
+            setTimeout(() => {
+                initMap();
+            }, 300);
             
             // Hidden Portal Trigger
             document.getElementById('logo-trigger').addEventListener('click', handleLogoClick);
+        }
+
+        // Location Settings Loader and Updater
+        function loadLocationSettings() {
+            const saved = localStorage.getItem(LOCATION_KEY);
+            if (saved) {
+                try {
+                    locationSettings = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Failed to parse location settings", e);
+                }
+            }
+
+            // Update UI
+            const addrEl = document.getElementById('outlet-address');
+            if (addrEl) {
+                addrEl.textContent = locationSettings.address;
+            }
+            const dirBtn = document.getElementById('get-directions-btn');
+            if (dirBtn) {
+                dirBtn.href = locationSettings.gmapsUrl;
+            }
+
+            // Pre-fill Admin Inputs
+            const fAddr = document.getElementById('config-address');
+            const fLat = document.getElementById('config-lat');
+            const fLng = document.getElementById('config-lng');
+            const fGmaps = document.getElementById('config-gmaps');
+            
+            if (fAddr) fAddr.value = locationSettings.address;
+            if (fLat) fLat.value = locationSettings.lat;
+            if (fLng) fLng.value = locationSettings.lng;
+            if (fGmaps) fGmaps.value = locationSettings.gmapsUrl;
+        }
+
+        function initMap() {
+            if (typeof L === 'undefined') return;
+            
+            const lat = parseFloat(locationSettings.lat) || -7.363842;
+            const lng = parseFloat(locationSettings.lng) || 112.720888;
+
+            try {
+                if (!mapInstance) {
+                    mapInstance = L.map('interactive-map', {
+                        scrollWheelZoom: false,
+                        zoomControl: true
+                    }).setView([lat, lng], 15);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors',
+                        maxZoom: 19
+                    }).addTo(mapInstance);
+                } else {
+                    mapInstance.setView([lat, lng], 15);
+                }
+
+                if (mapMarker) {
+                    mapMarker.remove();
+                }
+
+                // Beautiful interactive marker custom avatar/pin
+                const customIcon = L.divIcon({
+                    html: `
+                        <div class="relative flex items-center justify-center">
+                            <div class="absolute w-12 h-12 bg-orange-600/35 rounded-full animate-ping"></div>
+                            <div class="relative bg-primary text-white p-2.5 rounded-full shadow-xl border-2 border-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                    `,
+                    className: 'custom-map-marker',
+                    iconSize: [44, 44],
+                    iconAnchor: [22, 22]
+                });
+
+                mapMarker = L.marker([lat, lng], { icon: customIcon }).addTo(mapInstance);
+                mapMarker.bindPopup(`<div class="font-sans text-xs flex flex-col p-1"><b class="text-primary text-sm font-bold">Mutiara Snack</b><span class="text-gray-600 mt-1">${locationSettings.address}</span></div>`).openPopup();
+                
+                // Make sure correct size calculation inside parent div
+                setTimeout(() => {
+                    mapInstance.invalidateSize();
+                }, 100);
+            } catch(err) {
+                console.error("Map initialization failed", err);
+            }
+        }
+
+        function handleSaveLocation(e) {
+            e.preventDefault();
+            const address = document.getElementById('config-address').value;
+            const lat = parseFloat(document.getElementById('config-lat').value);
+            const lng = parseFloat(document.getElementById('config-lng').value);
+            const gmapsUrl = document.getElementById('config-gmaps').value;
+
+            locationSettings = { address, lat, lng, gmapsUrl };
+            localStorage.setItem(LOCATION_KEY, JSON.stringify(locationSettings));
+
+            loadLocationSettings();
+            initMap();
+            addToast('Pengaturan Lokasi berhasil diperbarui!');
         }
 
         // Google Drive Link Helper
@@ -441,7 +1176,7 @@
             });
         }
 
-        function showPage(pageId) {
+        function showPage(pageId, doScrollTop = true) {
             // Hide all sections
             document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
             // Remove active style from all nav links
@@ -456,6 +1191,22 @@
                 targetPage.querySelectorAll('.reveal').forEach(el => {
                     el.classList.remove('reveal-active');
                 });
+
+                // Let visible elements immediately fade in when page switches
+                setTimeout(() => {
+                    targetPage.querySelectorAll('.reveal').forEach(el => {
+                        const rect = el.getBoundingClientRect();
+                        if (rect.top < window.innerHeight) {
+                            el.classList.add('reveal-active');
+                        }
+                    });
+                }, 100);
+            }
+
+            if (pageId === 'home' && mapInstance) {
+                setTimeout(() => {
+                    mapInstance.invalidateSize();
+                }, 200);
             }
 
             // Also reset general elements like location on section changes
@@ -469,7 +1220,41 @@
             if (navBtn) navBtn.classList.add('active-nav');
             
             // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (doScrollTop) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function goToHome() {
+            showPage('home', true);
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active-nav'));
+            const navBtn = document.getElementById('nav-home');
+            if (navBtn) navBtn.classList.add('active-nav');
+        }
+
+        function goToAbout() {
+            showPage('about', true);
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active-nav'));
+            const navBtn = document.getElementById('nav-about');
+            if (navBtn) navBtn.classList.add('active-nav');
+        }
+
+        function goToPackages() {
+            const isHomeVisible = !document.getElementById('page-home').classList.contains('hidden');
+            if (!isHomeVisible) {
+                showPage('home', false);
+            }
+            
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active-nav'));
+            const navBtn = document.getElementById('nav-packages');
+            if (navBtn) navBtn.classList.add('active-nav');
+
+            setTimeout(() => {
+                const target = document.getElementById('packages-section');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         }
 
         function handleLogoClick() {
@@ -542,7 +1327,11 @@
         function toggleAdminDashboard(show) {
             if (!isAuthenticated) return toggleLoginModal(true);
             document.getElementById('admin-dashboard-modal').classList.toggle('hidden', !show);
-            if (show) renderAdminList();
+            if (show) {
+                renderAdminList();
+                renderAdminPortfolioList();
+                loadLocationSettings();
+            }
         }
 
         function renderProducts() {
@@ -615,6 +1404,9 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
             
             e.target.reset();
+            const previewBox = document.getElementById('new-imageUrl-preview');
+            if (previewBox) previewBox.classList.add('hidden');
+            
             renderProducts();
             renderAdminList();
             renderCategories();
@@ -670,6 +1462,740 @@
                 setTimeout(() => toast.remove(), 500);
             }, 3000);
             lucide.createIcons();
+        }
+
+        // --- Portfolio & Testimonials Methods ---
+        function renderPortfolios() {
+            const carousel = document.getElementById('portfolio-carousel');
+            if (!carousel) return;
+            carousel.innerHTML = '';
+
+            if (portfolios.length === 0) {
+                carousel.innerHTML = `
+                    <div class="col-span-full w-full text-center py-16 bg-orange-50/20 rounded-[2.5rem] border border-dashed border-orange-200">
+                        <i data-lucide="award" class="w-12 h-12 text-orange-300 mx-auto mb-4 animate-bounce"></i>
+                        <p class="text-gray-500 font-bold italic">Belum ada dokumentasi pesanan yang ditambahkan.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            portfolios.forEach((p, idx) => {
+                const imageUrl = fixGDriveLink(p.imageUrl);
+                const card = document.createElement('div');
+                card.id = `portfolio-card-${idx}`;
+                card.className = "flex-shrink-0 w-full md:w-[48%] lg:w-[31%] snap-start bg-white rounded-[2.5rem] border border-orange-100 shadow-md hover:shadow-2xl hover:-translate-y-2 hover:border-orange-200/90 transition-all duration-500 flex flex-col justify-between overflow-hidden relative group cursor-pointer";
+                card.innerHTML = `
+                    <div class="relative aspect-[4/3] overflow-hidden">
+                        <img src="${imageUrl}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" onerror="this.src='https://via.placeholder.com/500?text=Error+Loading+Image'">
+                        
+                        <!-- Rich, Interactive Glassmorphism & Gradient Overlay on Hover -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-orange-950/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col justify-end p-6 transform translate-y-3 group-hover:translate-y-0 backdrop-blur-[1px]">
+                            <div class="text-white space-y-1">
+                                <p class="text-[9px] font-black text-orange-200 uppercase tracking-[0.2em] flex items-center gap-1">
+                                    <i data-lucide="package" class="w-3.5 h-3.5 text-primary"></i> Detail Pesanan
+                                </p>
+                                <h5 class="font-extrabold text-sm leading-snug text-white line-clamp-1">${p.title}</h5>
+                                <p class="text-[11px] text-orange-50/95 leading-normal font-medium line-clamp-2">${p.details}</p>
+                                <div class="pt-2 border-t border-white/20 flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold text-orange-200 flex items-center gap-1 uppercase tracking-wider">
+                                        <i data-lucide="heart" class="w-3 h-3 text-primary animate-pulse fill-primary"></i> ${p.clientName}
+                                    </span>
+                                    <span class="text-[8px] text-green-300 font-extrabold uppercase bg-green-500/20 px-1.5 py-0.5 rounded border border-green-500/30 flex items-center gap-0.5">
+                                        Verified
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute top-4 left-4 z-10">
+                            <span class="px-4 py-1.5 bg-primary/90 text-white text-[11px] font-black rounded-full shadow-lg flex items-center gap-1.5 backdrop-blur-sm tracking-wider uppercase group-hover:bg-orange-850 transition-colors">
+                                <i data-lucide="camera" class="w-3.5 h-3.5 animate-pulse"></i> Dokumentasi Acara
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8 flex-1 flex flex-col justify-between group-hover:bg-orange-50/10 transition-colors duration-500">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-xl font-black text-gray-900 leading-tight group-hover:text-primary transition-colors duration-300">${p.title}</h4>
+                                <p class="text-xs text-orange-700 font-extrabold mt-2 uppercase tracking-wide flex items-center gap-1">
+                                    <i data-lucide="info" class="w-3.5 h-3.5 text-primary"></i> ${p.details}
+                                </p>
+                            </div>
+                            
+                            <!-- Testimonial Quote -->
+                            <div class="relative bg-orange-50/40 p-5 rounded-2xl border border-orange-100/30 group-hover:bg-orange-100/20 group-hover:border-orange-100/80 transition-all duration-500 italic text-gray-650 text-sm leading-relaxed">
+                                <span class="absolute top-1 left-2 text-primary font-serif text-3xl opacity-20">“</span>
+                                <p class="relative z-10 pl-4 pr-2 italic font-medium">"${p.testimonial}"</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Client details -->
+                        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-orange-100 group-hover:border-orange-200 transition-colors duration-500">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black text-sm group-hover:scale-105 transition-transform duration-500">
+                                <i data-lucide="user-check" class="w-5 h-5 text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900 text-sm leading-tight">${p.clientName}</p>
+                                <div class="flex items-center gap-1 text-[10px] text-green-650 font-extrabold uppercase mt-0.5">
+                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-green-600"></i> Pelanggan Terverifikasi
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                carousel.appendChild(card);
+            });
+
+            renderPortfolioDots();
+            lucide.createIcons();
+        }
+
+        function scrollPortfolio(direction) {
+            const container = document.getElementById('portfolio-carousel');
+            if (!container) return;
+            
+            // Get first card to calculate exact width + gap (gap-8 is 2rem = 32px)
+            const firstCard = container.querySelector('[id^="portfolio-card-"]');
+            let scrollAmount = container.clientWidth;
+            if (firstCard) {
+                scrollAmount = firstCard.offsetWidth + 32;
+            }
+            
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        function renderPortfolioDots() {
+            const dotsContainer = document.getElementById('portfolio-dots');
+            if (!dotsContainer) return;
+            dotsContainer.innerHTML = '';
+            
+            // Generate 1 dot per 3 items (minimum 1 dot if there are any portfolios)
+            const dotCount = Math.ceil(portfolios.length / 3);
+            if (dotCount <= 0) return;
+
+            for (let idx = 0; idx < dotCount; idx++) {
+                const dot = document.createElement('button');
+                dot.ariaLabel = `Halaman Portofolio ${idx + 1}`;
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${idx === 0 ? 'bg-primary w-6' : 'bg-orange-200'}`;
+                dot.onclick = () => {
+                    const targetCardIndex = idx * 3;
+                    const card = document.getElementById(`portfolio-card-${targetCardIndex}`);
+                    if (card) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                        document.querySelectorAll('#portfolio-dots button').forEach((b, bIdx) => {
+                            if (bIdx === idx) {
+                                b.classList.add('bg-primary', 'w-6');
+                                b.classList.remove('bg-orange-200');
+                            } else {
+                                b.classList.remove('bg-primary', 'w-6');
+                                b.classList.add('bg-orange-200');
+                            }
+                        });
+                    }
+                };
+                dotsContainer.appendChild(dot);
+            }
+
+            const carousel = document.getElementById('portfolio-carousel');
+            if (carousel) {
+                carousel.onscroll = () => {
+                    const cards = carousel.querySelectorAll('[id^="portfolio-card-"]');
+                    let activeCardIndex = 0;
+                    let minDiff = Infinity;
+                    
+                    cards.forEach((card, index) => {
+                        const diff = Math.abs(card.offsetLeft - carousel.offsetLeft - carousel.scrollLeft);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            activeCardIndex = index;
+                        }
+                    });
+
+                    // Map card index to group index (divided by 3)
+                    const activeDotIndex = Math.floor(activeCardIndex / 3);
+
+                    document.querySelectorAll('#portfolio-dots button').forEach((b, bIdx) => {
+                        if (bIdx === activeDotIndex) {
+                            b.classList.add('bg-primary', 'w-6');
+                            b.classList.remove('bg-orange-200');
+                        } else {
+                            b.classList.remove('bg-primary', 'w-6');
+                            b.classList.add('bg-orange-200');
+                        }
+                    });
+                };
+            }
+        }
+
+        function initPortfolioDragScroll() {
+            const container = document.getElementById('portfolio-carousel');
+            if (!container) return;
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            let hasMoved = false;
+
+            // Stop image drag ghosts from interfering with our drag-scroll action
+            container.addEventListener('dragstart', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                }
+            });
+
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                hasMoved = false;
+                container.classList.add('cursor-grabbing');
+                container.style.cursor = 'grabbing';
+                
+                // Disable smooth scroll and snap behaviors during manual drag to make the scroll movement instant/responsive
+                container.classList.remove('scroll-smooth', 'snap-x', 'snap-mandatory');
+                
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                if (!isDown) return;
+                isDown = false;
+                container.classList.remove('cursor-grabbing');
+                container.style.removeProperty('cursor');
+                // Restore snap & smooth behavior
+                container.classList.add('scroll-smooth', 'snap-x', 'snap-mandatory');
+            });
+
+            container.addEventListener('mouseup', () => {
+                if (!isDown) return;
+                isDown = false;
+                container.classList.remove('cursor-grabbing');
+                container.style.removeProperty('cursor');
+                // Restore snap & smooth behavior
+                container.classList.add('scroll-smooth', 'snap-x', 'snap-mandatory');
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 1.5; // scroll speed modifier
+                
+                if (Math.abs(walk) > 5) {
+                    hasMoved = true;
+                }
+                
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // If user was dragging, block click events inside the carousel
+            container.addEventListener('click', (e) => {
+                if (hasMoved) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+        }
+
+        function handleAddPortfolio(e) {
+            e.preventDefault();
+            const title = document.getElementById('port-title').value;
+            const details = document.getElementById('port-details').value;
+            const imageUrl = document.getElementById('port-imageUrl').value;
+            const clientName = document.getElementById('port-client').value;
+            const testimonial = document.getElementById('port-testimonial').value;
+
+            const newPortfolioItem = {
+                id: 'p_' + Date.now().toString(),
+                title,
+                details,
+                imageUrl,
+                clientName,
+                testimonial
+            };
+
+            portfolios = [newPortfolioItem, ...portfolios];
+            localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(portfolios));
+
+            e.target.reset();
+            const previewBox = document.getElementById('port-imageUrl-preview');
+            if (previewBox) previewBox.classList.add('hidden');
+            
+            renderPortfolios();
+            renderAdminPortfolioList();
+            addToast(`Dokumentasi "${title}" Berhasil Ditambahkan`);
+        }
+
+        function deletePortfolio(id) {
+            if(confirm('Hapus dokumentasi & testimoni ini dari daftar?')) {
+                portfolios = portfolios.filter(p => p.id !== id);
+                localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(portfolios));
+                renderPortfolios();
+                renderAdminPortfolioList();
+                addToast('Dokumentasi & Testimoni Dihapus');
+            }
+        }
+
+        function renderAdminPortfolioList() {
+            const list = document.getElementById('admin-portfolio-list');
+            if (!list) return;
+            document.getElementById('admin-portfolio-count').textContent = portfolios.length;
+            list.innerHTML = '';
+            
+            if (portfolios.length === 0) {
+                list.innerHTML = `<p class="text-gray-400 italic text-xs py-4 text-center">Belum ada dokumentasi pesanan.</p>`;
+                return;
+            }
+
+            portfolios.forEach(p => {
+                const imageUrl = fixGDriveLink(p.imageUrl);
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-4 bg-gray-50 rounded-2xl border-2 border-gray-50";
+                item.innerHTML = `
+                    <div class="flex items-center gap-4 min-w-0 flex-1">
+                        <img src="${imageUrl}" class="w-12 h-12 rounded-lg object-cover shadow-sm flex-shrink-0" onerror="this.src='https://via.placeholder.com/150'">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-bold text-gray-900 text-sm truncate">${p.title}</p>
+                            <p class="text-xs text-primary font-bold truncate">${p.clientName}</p>
+                        </div>
+                    </div>
+                    <button onclick="deletePortfolio('${p.id}')" class="p-2 text-red-400 hover:text-red-600 ml-2 flex-shrink-0"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                `;
+                list.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        // --- Google Drive Link & File Backup Handlers ---
+        function switchUtilityTab(tab) {
+            const btnGallery = document.getElementById('tab-utility-gallery');
+            const btnTester = document.getElementById('tab-utility-tester');
+            const btnBackup = document.getElementById('tab-utility-backup');
+            
+            const panelGallery = document.getElementById('panel-utility-gallery');
+            const panelTester = document.getElementById('panel-utility-tester');
+            const panelBackup = document.getElementById('panel-utility-backup');
+
+            const activeClass = 'flex-1 min-w-[120px] py-3 text-xs font-black rounded-lg transition-all bg-white text-gray-950 shadow-sm cursor-pointer';
+            const inactiveClass = 'flex-1 min-w-[120px] py-3 text-xs font-black rounded-lg transition-all text-gray-500 hover:text-gray-900 cursor-pointer';
+
+            if (btnGallery) btnGallery.className = (tab === 'gallery') ? activeClass : inactiveClass;
+            if (btnTester) btnTester.className = (tab === 'tester') ? activeClass : inactiveClass;
+            if (btnBackup) btnBackup.className = (tab === 'backup') ? activeClass : inactiveClass;
+
+            if (panelGallery) panelGallery.classList.toggle('hidden', tab !== 'gallery');
+            if (panelTester) panelTester.classList.toggle('hidden', tab !== 'tester');
+            if (panelBackup) panelBackup.classList.toggle('hidden', tab !== 'backup');
+            
+            if (tab === 'gallery') {
+                renderMediaGallery();
+            }
+        }
+
+        // --- Pustaka Media & Gallery Implementations ---
+        function renderMediaGallery() {
+            const grid = document.getElementById('gallery-items-grid');
+            const countSpan = document.getElementById('gallery-count');
+            if (!grid) return;
+
+            countSpan.textContent = mediaGallery.length;
+            grid.innerHTML = '';
+
+            if (mediaGallery.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-8 text-center bg-orange-50/30 rounded-xl border border-dashed border-orange-200">
+                        <p class="text-[10px] text-gray-400 font-bold italic">Belum ada foto tersimpan. Silakan upload atau daftarkan link baru.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            mediaGallery.forEach(item => {
+                const url = fixGDriveLink(item.url);
+                const col = document.createElement('div');
+                col.className = 'group relative aspect-square rounded-xl overflow-hidden border border-orange-100 bg-white hover:border-primary transition-all shadow-sm cursor-pointer flex flex-col justify-between';
+                
+                // Allow clicking thumbnail to copy URL of image to clipboard
+                col.innerHTML = `
+                    <div class="relative w-full aspect-square overflow-hidden bg-gray-50 flex-1" onclick="copyGalleryLink('${url}', '${item.name}')">
+                        <img src="${url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                        <div class="absolute bottom-0 inset-x-0 bg-black/60 p-2 text-white">
+                            <p class="text-[9px] font-black truncate leading-tight uppercase tracking-wider">${item.name}</p>
+                        </div>
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <span class="p-1.5 bg-white/95 text-primary text-[8px] font-black rounded-lg uppercase tracking-widest flex items-center gap-1 shadow-md">
+                                <i data-lucide="copy" class="w-2.5 h-2.5"></i> Salin Link
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Quick Delete bar -->
+                    <div class="p-1 px-2 border-t border-orange-50 bg-orange-50/20 flex justify-between items-center shrink-0">
+                        <span class="text-[8px] text-gray-400 font-mono truncate max-w-[80px]">${item.id.startsWith('g_') ? 'HP' : 'Drive'}</span>
+                        <button type="button" onclick="deleteGalleryItem('${item.id}', event)" class="text-red-500 hover:text-red-700 p-1" title="Hapus dari pustaka">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+            lucide.createIcons();
+        }
+
+        function copyGalleryLink(url, name) {
+            navigator.clipboard.writeText(url).then(() => {
+                addToast(`Link "${name}" disalin ke clipboard!`);
+            }).catch(() => {
+                // Fallback direct input copy helper
+                const tempInput = document.createElement('input');
+                tempInput.value = url;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                tempInput.remove();
+                addToast(`Link "${name}" disalin ke clipboard!`);
+            });
+        }
+
+        function handleRegisterGalleryLink(e) {
+            e.preventDefault();
+            const labelInput = document.getElementById('reg-gallery-name');
+            const urlInput = document.getElementById('reg-gallery-url');
+
+            const label = labelInput.value.trim();
+            const rawUrl = urlInput.value.trim();
+
+            if (!label || !rawUrl) return;
+
+            const finalUrl = fixGDriveLink(rawUrl);
+            const newItem = {
+                id: 'l_' + Date.now().toString(),
+                name: label,
+                url: finalUrl
+            };
+
+            mediaGallery = [newItem, ...mediaGallery];
+            localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+
+            labelInput.value = '';
+            urlInput.value = '';
+
+            renderMediaGallery();
+            addToast(`Link foto "${label}" berhasil didaftarkan ke Pustaka!`, 'success');
+        }
+
+        function handleLocalFileGalleryUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const origName = file.name.split('.')[0] || 'Foto Unggahan';
+                const labelName = origName.substring(0, 16);
+
+                const newItem = {
+                    id: 'g_' + Date.now().toString(),
+                    name: labelName,
+                    url: base64Url
+                };
+
+                mediaGallery = [newItem, ...mediaGallery];
+                localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+
+                renderMediaGallery();
+                addToast(`Foto "${labelName}" berhasil diunggah ke Pustaka!`, 'success');
+                e.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function deleteGalleryItem(id, event) {
+            if (event) event.stopPropagation();
+            const item = mediaGallery.find(g => g.id === id);
+            const name = item ? item.name : 'Foto';
+
+            if (confirm(`Hapus foto "${name}" dari pustaka tersimpan?`)) {
+                mediaGallery = mediaGallery.filter(g => g.id !== id);
+                localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+                renderMediaGallery();
+                addToast('Foto berhasil dihapus dari Pustaka');
+            }
+        }
+
+        // --- Media Picker Modal Interactivity ---
+        function openMediaPicker(targetId) {
+            currentActivePickerTarget = targetId;
+            const modal = document.getElementById('media-picker-modal');
+            if (modal) modal.classList.remove('hidden');
+            searchPickerGallery(); // populate initial items
+        }
+
+        function closeMediaPicker() {
+            const modal = document.getElementById('media-picker-modal');
+            if (modal) modal.classList.add('hidden');
+            currentActivePickerTarget = null;
+        }
+
+        function searchPickerGallery() {
+            const grid = document.getElementById('picker-items-grid');
+            if (!grid) return;
+
+            const searchInput = document.getElementById('gallery-picker-search');
+            const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            grid.innerHTML = '';
+            const filtered = mediaGallery.filter(item => item.name.toLowerCase().includes(keyword));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-10 text-center text-gray-400 italic text-xs">
+                        Foto tidak ditemukan. Silakan ganti kata pencarian atau klik 'Upload Baru' di atas.
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const url = fixGDriveLink(item.url);
+                const card = document.createElement('div');
+                card.className = 'group relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-white hover:border-primary transition-all cursor-pointer shadow-sm';
+                card.onclick = () => selectPickerImage(url);
+                card.innerHTML = `
+                    <img src="${url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                    <div class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white">
+                        <p class="text-[9px] font-black truncate leading-tight uppercase tracking-wider">${item.name}</p>
+                    </div>
+                    <div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span class="px-2.5 py-1.5 bg-primary text-white text-[8px] font-black rounded-lg uppercase tracking-wider flex items-center gap-1 shadow-md">
+                            <i data-lucide="check" class="w-3 h-3"></i> Pilih Foto
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function selectPickerImage(url) {
+            if (!currentActivePickerTarget) return;
+
+            const input = document.getElementById(currentActivePickerTarget);
+            if (input) {
+                input.value = url;
+                updateFormImagePreview(currentActivePickerTarget, url);
+                addToast('Foto pustaka terpasang!');
+            }
+            closeMediaPicker();
+        }
+
+        function handlePickerDirectUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const label = (file.name.split('.')[0] || 'HP Upload').substring(0, 16);
+
+                const newItem = {
+                    id: 'g_' + Date.now().toString(),
+                    name: label,
+                    url: base64Url
+                };
+
+                mediaGallery = [newItem, ...mediaGallery];
+                localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+
+                renderMediaGallery();
+                
+                // Set directly on active picker target
+                if (currentActivePickerTarget) {
+                    selectPickerImage(base64Url);
+                }
+                
+                e.target.value = '';
+                addToast(`Foto "${label}" berhasil diunggah & dipasang!`, 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleFormDirectUpload(e, inputId) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64Url = evt.target.result;
+                const label = (file.name.split('.')[0] || 'Cepat HP').substring(0, 16);
+
+                const newItem = {
+                    id: 'g_' + Date.now().toString(),
+                    name: label,
+                    url: base64Url
+                };
+
+                mediaGallery = [newItem, ...mediaGallery];
+                localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+
+                renderMediaGallery();
+
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = base64Url;
+                    updateFormImagePreview(inputId, base64Url);
+                }
+
+                addToast(`Unggahan langsung "${label}" berhasil terpasang & tersimpan!`, 'success');
+                e.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateFormImagePreview(inputId, url) {
+            const pBox = document.getElementById(inputId + '-preview');
+            if (pBox) {
+                pBox.classList.remove('hidden');
+                const img = pBox.querySelector('img');
+                if (img) img.src = url;
+            }
+        }
+
+        function clearFormImagePreview(inputId) {
+            const pBox = document.getElementById(inputId + '-preview');
+            const input = document.getElementById(inputId);
+            if (pBox) pBox.classList.add('hidden');
+            if (input) {
+                input.value = '';
+                addToast('Tautan pilihan dibatalkan');
+            }
+        }
+
+        function convertAndPreviewGDrive() {
+            const inputUrl = document.getElementById('gdrive-test-url').value.trim();
+            if (!inputUrl) {
+                addToast('Harap masukkan URL Google Drive terlebih dahulu!', 'error');
+                return;
+            }
+
+            const directLink = fixGDriveLink(inputUrl);
+            const previewBox = document.getElementById('gdrive-preview-box');
+            const previewImg = document.getElementById('gdrive-preview-img');
+            const directUrlInput = document.getElementById('gdrive-direct-url');
+
+            if (directLink === inputUrl && !inputUrl.includes('drive.google.com')) {
+                addToast('Peringatan: Link tampaknya bukan dari Google Drive, tetapi kami akan tetap mencoba konversinya.', 'error');
+            }
+
+            previewBox.classList.remove('hidden');
+            previewImg.src = directLink;
+            directUrlInput.value = directLink;
+            addToast('Berhasil memproses link Google Drive!');
+        }
+
+        function handleGDrivePreviewError() {
+            addToast('Gambar gagal dimuat! Pastikan akses file di Google Drive diset ke "Siapa saja yang memiliki link" (Anyone with link).', 'error');
+        }
+
+        function applyGDriveDirectLink(inputId) {
+            const directLink = document.getElementById('gdrive-direct-url').value;
+            if (!directLink) {
+                addToast('Hasil konversi kosong!', 'error');
+                return;
+            }
+
+            const targetInput = document.getElementById(inputId);
+            if (targetInput) {
+                targetInput.value = directLink;
+                // Highlight target input visually to guide user
+                targetInput.classList.add('ring-4', 'ring-primary/25');
+                setTimeout(() => {
+                    targetInput.classList.remove('ring-4', 'ring-primary/25');
+                }, 1500);
+                addToast('Link berhasil ditempel ke input form!');
+            } else {
+                addToast('Form input target tidak ditemukan.', 'error');
+            }
+        }
+
+        function downloadBackupDataFile() {
+            const backupPayload = {
+                appName: "Mutiara Snack Database Backup",
+                exportedAt: new Date().toISOString(),
+                products: products,
+                portfolios: portfolios,
+                mediaGallery: mediaGallery,
+                locationSettings: locationSettings
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload, null, 4));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `mutiara_snack_database_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            addToast('File database & pustaka foto (.json) berhasil diunduh!');
+        }
+
+        function uploadBackupDataFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    
+                    // Basic structural verification
+                    if (!parsed.products || !parsed.portfolios) {
+                        throw new Error('Format file salah atau rusak. Pastikan file adalah file backup valid.');
+                    }
+
+                    // Save data to state
+                    products = parsed.products;
+                    portfolios = parsed.portfolios;
+                    if (parsed.locationSettings) {
+                        locationSettings = parsed.locationSettings;
+                    }
+                    if (parsed.mediaGallery) {
+                        mediaGallery = parsed.mediaGallery;
+                        localStorage.setItem(MEDIAGALLERY_KEY, JSON.stringify(mediaGallery));
+                    }
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+                    localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(portfolios));
+                    localStorage.setItem(LOCATION_KEY, JSON.stringify(locationSettings));
+
+                    // Re-render whole UI
+                    renderProducts();
+                    renderCategories();
+                    renderPortfolios();
+                    renderMediaGallery();
+                    renderAdminList();
+                    renderAdminPortfolioList();
+                    loadLocationSettings();
+                    
+                    if (typeof initMap === 'function') {
+                        initMap();
+                    }
+
+                    addToast('Data & pustaka foto berhasil dipulihkan!', 'success');
+                    
+                    // Reset upload input
+                    event.target.value = '';
+                } catch(err) {
+                    console.error(err);
+                    addToast('Gagal memulihkan file: ' + err.message, 'error');
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
         }
 
         function formatPrice(num) {
